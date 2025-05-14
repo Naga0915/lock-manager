@@ -6,3 +6,14 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 8080:8080
+  db:
+    image: postgres:17-alpine
+    container_name: lockmng-db
+    environment:
+      - POSTGRES_DB=lockmng-db
+      - POSTGRES_USER=lockmng-db
+      - POSTGRES_PASSWORD=lockmng-db
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
