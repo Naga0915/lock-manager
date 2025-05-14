@@ -13,4 +13,8 @@ public class HomeController {
         model.addAttribute("name", "["+name+"]");
         return "index.html";
     }
+    @GetMapping("/header")
+    public String getHeader(Model model) {
+        return "fragments/header.html";
+    }
 }
