@@ -1,5 +1,7 @@
 package jp.oecu.lockmng.controller;
 
+import java.time.Instant;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ public class HomeController {
     }
     @GetMapping("/header")
     public String getHeader(Model model) {
+        Instant.now().toEpochMilli();
         return "fragments/header.html";
     }
 }
