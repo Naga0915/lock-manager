@@ -7,5 +7,16 @@
 </head>
 <body>
     <h1>ログイン画面</h1>
+    <form th:action="@{/login}" method="post">
+        <input type="text" name="username" placeholder="ユーザID" required />
+        <input type="password" name="password" placeholder="パスワード" required />
+        <button type="submit">Login</button>
+    </form>
+    <div th:if="${param.s != null and param.s[0] == '0'}">
+    Invalid username or password.
+    </div>
+    <div th:if="${param.s != null and param.s[0] == '1'}">
+    You have been logged out.
+    </div>
 </body>
 </html>
