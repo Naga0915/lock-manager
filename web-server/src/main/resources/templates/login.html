@@ -13,7 +13,7 @@
         <button type="submit">Login</button>
     </form>
     <div th:if="${param.s != null and param.s[0] == '0'}">
-    Invalid username or password.
+    パスワードかユーザーIDが違います
     </div>
     <div th:if="${param.s != null and param.s[0] == '1'}">
     You have been logged out.
