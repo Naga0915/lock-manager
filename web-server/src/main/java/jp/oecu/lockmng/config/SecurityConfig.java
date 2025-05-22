@@ -10,15 +10,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import jp.oecu.lockmng.service.UserService;
+import jp.oecu.lockmng.service.UserDetailService;
 
 @Configuration
 public class SecurityConfig {
-    private final UserService userService;
+    private final UserDetailService userDetailService;
 
     @Autowired
-    public SecurityConfig(UserService userService){
-        this.userService = userService;
+    public SecurityConfig(UserDetailService userDetailService){
+        this.userDetailService = userDetailService;
     }
 
     @Bean
@@ -26,12 +26,18 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login").permitAll()
+                .requestMatchers("/logout").authenticated()
+                //.requestMatchers("/admin/**").hasRole("ADMIN") //本番用
+                .requestMatchers("/admin/**").permitAll() //テスト用
+                .requestMatchers("/error").permitAll()
                 .requestMatchers("/").permitAll()
                 .anyRequest().authenticated()
             ).formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
                 .failureUrl("/login?s=0")
+                .usernameParameter("userid")
+                .passwordParameter("password")
                 .permitAll()
             ).logout(logout->logout
                 .logoutUrl("/logout")
@@ -46,7 +52,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder) throws Exception{
         AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
         builder
-            .userDetailsService(userService)
+            .userDetailsService(userDetailService)
             .passwordEncoder(passwordEncoder);
         return builder.build();
     }
