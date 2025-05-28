@@ -34,3 +34,6 @@ build/
 
 ### db ###
 db_data/
+
+### logs ###
+log/
