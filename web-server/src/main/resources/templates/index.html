@@ -14,13 +14,14 @@
             <h1>灰の墓所</h1>
 
             <p>ようこそ、<span th:text="${name}"></span>様</p>
-            <button type="button" class="btn btn-primary mb-4">今すぐ予約</button>
+            <a href="/user/reser" class="btn btn-primary mb-4">今すぐ予約</a>
 
             <p>あなたの予約状況</p>
-            <button type="button" class="btn btn-success">日時・ロッカー番号</button>
+            <a href="/user/resv" class="btn btn-success">日時・ロッカー番号</a>
         </div>
     </div>
 
+    <h3 style="text-align:center">カレンダーで予約状況を表示</h3>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>
 </html>
