@@ -9,6 +9,6 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "app.password")
 @Data
 public class PasswordConfig {
-    private int length = 8;
-    private String algorithm = "bf";
+    private int length_min = 8;
+    private int length_max = 100;
 }

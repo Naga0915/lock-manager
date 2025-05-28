@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @Table(name = "users")
-@Check(constraints = "email IS NOT NULL OR phone IS NOT NULL")
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -38,6 +37,9 @@ public class User {
 
     @Column(name = "password_hash", nullable = false, columnDefinition = "text")
     private String passwordHash;
+
+    @Column(name = "role", nullable = false)
+    private String role;
 
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
