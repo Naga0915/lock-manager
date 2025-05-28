@@ -9,7 +9,10 @@
       margin: 0;
       padding: 0;
       font-family: Georgia, serif;
-      background-color: #fff;
+      background-image: url("background.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       color: #333;
       display: flex;
       justify-content: center;
@@ -25,6 +28,9 @@
       transform: scale(0.5) translateY(20px);
       animation: popIn 30.5s ease-out forwards;
       text-align: center;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px 40px;
+      border-radius: 12px;
     }
 
     @keyframes popIn {
@@ -45,20 +51,23 @@
       font-size: 16px;
       margin: 5px 0;
       text-align: center;
+      background-color: rgba(255, 255, 255, 0.7);
+      padding: 8px 16px;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
   <div class="error-code">404 Not Found</div>
-  <!-- <div class="error-detail" th:text="'timestamp: ' + ${timestamp}"></div>
+  <!--
+  <div class="error-detail" th:text="'timestamp: ' + ${timestamp}"></div>
   <div class="error-detail" th:text="'status: ' + ${status}"></div>
   <div class="error-detail" th:text="'error: ' + ${error}"></div>
   <div class="error-detail" th:text="'exception: ' + ${exception}"></div>
   <div class="error-detail" th:text="'message: ' + ${message}"></div>
   <div class="error-detail" th:text="'errors: ' + ${errors}"></div>
   <div class="error-detail" th:text="'trace: ' + ${trace}"></div>
-  <div class="error-detail" th:text="'path: ' + ${path}"></div> -->
+  <div class="error-detail" th:text="'path: ' + ${path}"></div>
+  -->
 </body>
 </html>
-
-<!-- https://qiita.com/niwasawa/items/f3479ef16efa488039fb　これ参照にして作る -->
