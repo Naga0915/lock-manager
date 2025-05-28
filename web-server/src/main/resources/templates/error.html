@@ -1,18 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>エラーページ</title>
+  <style>
+    body {
+      font-family: Georgia, serif;
+      background-color: #fff;
+      padding: 40px;
+      color: #333;
+    }
+
+    .error-code {
+      color: red;
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 1.5s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .error-detail {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+  </style>
 </head>
 <body>
-  <div th:text="'timestamp: ' + ${timestamp}"></div>
-  <div th:text="'status: ' + ${status}"></div>
-  <div th:text="'error: ' + ${error}"></div>
-  <div th:text="'exception: ' + ${exception}"></div>
-  <div th:text="'message: ' + ${message}"></div>
-  <div th:text="'errors: ' + ${errors}"></div>
-  <div th:text="'trace: ' + ${trace}"></div>
-  <div th:text="'path: ' + ${path}"></div>
+  <div class="error-code">404 Not Found</div>
+  <div class="error-detail" th:text="'timestamp: ' + ${timestamp}"></div>
+  <div class="error-detail" th:text="'status: ' + ${status}"></div>
+  <div class="error-detail" th:text="'error: ' + ${error}"></div>
+  <div class="error-detail" th:text="'exception: ' + ${exception}"></div>
+  <div class="error-detail" th:text="'message: ' + ${message}"></div>
+  <div class="error-detail" th:text="'errors: ' + ${errors}"></div>
+  <div class="error-detail" th:text="'trace: ' + ${trace}"></div>
+  <div class="error-detail" th:text="'path: ' + ${path}"></div>
 </body>
 </html>
+
+
 <!-- https://qiita.com/niwasawa/items/f3479ef16efa488039fb　これ参照にして作る -->
