@@ -1,33 +1,38 @@
 package jp.oecu.lockmng.service;
 
-import java.util.List;
+import java.lang.StackWalker.Option;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jp.oecu.lockmng.entity.User;
+import jp.oecu.lockmng.model.NewUserModel;
 import jp.oecu.lockmng.repository.jpa.UserRepository;
 
 @Service
-public class UserService implements UserDetailsService{
-    private final UserRepository userRepository;
+public class UserService {
+    private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository){
-        this.userRepository = userRepository;
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder){
+        this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByIdStr(username).orElseThrow(() -> new UsernameNotFoundException("user id=\"" + username + "\" not found"));
-        return new org.springframework.security.core.userdetails.User(
-            user.getIdStr(),
-            user.getPasswordHash(),
-            List.of(new SimpleGrantedAuthority("ROLE_USER"))
-        );
+    public Optional<String> newUser(NewUserModel model){
+        if(!model.getPassword().equals(model.getPasswordCheck())){
+            return Optional.of("パスワードが一致しません");
+        }
+        User user = new User();
+        user.setIdStr(model.getUserId());
+        user.setName(model.getUserName());
+        user.setEmail(model.getUserEmail());
+        user.setPhone(model.getUserPhoneNumber());
+        user.setPasswordHash(passwordEncoder.encode(model.getPassword()));
+        repository.save(user);
+        return Optional.empty();
     }
 }

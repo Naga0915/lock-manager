@@ -1,14 +1,14 @@
 package jp.oecu.lockmng.entity;
 
-import org.springframework.data.relational.core.mapping.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Check;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @Table(name = "users")
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Check(constraints = "email IS NOT NULL OR phone IS NOT NULL")
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -30,8 +30,11 @@ public class User {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "email", nullable = false, length = 320, unique = true)
+    @Column(name = "email", length = 320)
     private String email;
+
+    @Column(name = "phone", length = 320)
+    private String phone;
 
     @Column(name = "password_hash", nullable = false, columnDefinition = "text")
     private String passwordHash;
