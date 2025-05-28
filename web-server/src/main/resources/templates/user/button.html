@@ -7,5 +7,42 @@
 </head>
 <body>
     <h1>電子錠の操作画面</h1>
+
+    <form id="unlockForm">
+        <label for="lockerSelect">ロッカー番号を選択してください:</label>
+        <select id="lockerSelect" name="locker">
+            <option value="101">101</option>
+            <option value="102">102</option>
+            <option value="103">103</option>
+            <!-- 必要に応じて追加 -->
+        </select>
+        <button type="submit">アンロック</button>
+    </form>
+
+    <p id="result"></p>
+
+    <script>
+        document.getElementById('unlockForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // フォームの通常送信をキャンセル
+
+            const lockerNumber = document.getElementById('lockerSelect').value;
+
+            fetch('/unlock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ locker: lockerNumber })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').textContent = data.message;
+            })
+            .catch(error => {
+                console.error('エラー:', error);
+                document.getElementById('result').textContent = '通信エラーが発生しました。';
+            });
+        });
+    </script>
 </body>
 </html>
