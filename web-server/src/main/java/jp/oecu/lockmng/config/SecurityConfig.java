@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").permitAll() //テスト用
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/").permitAll()
+                .requestMatchers("/r/**").permitAll()
                 .anyRequest().authenticated()
             ).formLogin(form -> form
                 .loginPage("/login")
