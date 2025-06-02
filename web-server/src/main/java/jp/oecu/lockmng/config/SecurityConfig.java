@@ -31,6 +31,7 @@ public class SecurityConfig {
                 //.requestMatchers("/admin/**").hasRole("ADMIN") //本番用
                 .requestMatchers("/admin/**").permitAll() //テスト用
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/register/**").permitAll()
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/r/**").permitAll()
                 .anyRequest().authenticated()

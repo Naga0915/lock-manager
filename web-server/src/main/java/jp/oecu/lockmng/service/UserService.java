@@ -1,5 +1,6 @@
 package jp.oecu.lockmng.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,10 @@ public class UserService {
         this.passwordConfig = passwordConfig;
     }
 
+    public List<User> findAll(){
+        return repository.findAll();
+    }
+
     public Optional<String> newUser(NewUserModel model){
         if(model.getPassword() != null)
         if(!model.getPassword().equals(model.getPasswordCheck())){
@@ -49,8 +54,10 @@ public class UserService {
         if(model.getUserEmail().isBlank() && model.getUserPhoneNumber().isBlank()){
             return Optional.of("Eメールアドレスか電話番号が必要");
         }
-        if(!commonValidator.isEmailValid(model.getUserEmail())){
-            return Optional.of(String.format("メールアドレスの形式が不正： %s", model.getUserEmail()));
+        if(!model.getUserEmail().isBlank()){
+            if(!commonValidator.isEmailValid(model.getUserEmail())){
+                return Optional.of(String.format("メールアドレスの形式が不正： %s", model.getUserEmail()));
+            }
         }
         if(repository.existsByIdStr(model.getUserId())){
             return Optional.of("そのユーザIDはすでに使われています。");

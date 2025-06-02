@@ -1,15 +1,19 @@
 package jp.oecu.lockmng.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.oecu.lockmng.entity.User;
 import jp.oecu.lockmng.model.NewUserModel;
 import jp.oecu.lockmng.service.UserService;
 
@@ -29,23 +33,32 @@ public class AdminController {
     }
 
     @GetMapping("/admin/user")
-    public String users(){
+    public String users(Model model){
+        List<User> users = userService.findAll();
+        model.addAttribute("users", users);
         return "admin/users.html";
     }
 
     @GetMapping("/admin/user/new")
     public String userNew(Model model){
-        //model.addAttribute("msg", "ヤッターマン");
         return "admin/newuser.html";
     }
 
     @PostMapping("/admin/user/new")
-    public String userNewPost(@ModelAttribute NewUserModel userModel, Model model, RedirectAttributes redirectAttributes) {
+    public String userNewPost(@ModelAttribute NewUserModel userModel, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            StringBuilder sb = new StringBuilder();
+            for (FieldError e : bindingResult.getFieldErrors()) {
+                sb.append(e.getDefaultMessage() + "\n");
+            }
+            redirectAttributes.addFlashAttribute("msg", bindingResult);
+            return "redirect:/admin/user/new";
+        }
         Optional<String> result = userService.newUser(userModel);
         if(result.isPresent()){
             redirectAttributes.addFlashAttribute("msg", result.get());
         }else{
-            redirectAttributes.addFlashAttribute("msg", "successfully created new user");
+            redirectAttributes.addFlashAttribute("msg", "新しいユーザを作成しました。");
         }
         return "redirect:/admin/user/new";
     }

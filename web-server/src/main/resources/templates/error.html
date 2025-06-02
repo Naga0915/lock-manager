@@ -5,29 +5,54 @@
   <title>エラーページ</title>
   <style>
     html, body {
+      font-size: 8vmin;
+      width: 100%;
       height: 100%;
       margin: 0;
       padding: 0;
       font-family: Georgia, serif;
-      background-image: url("/r/error_background.jpg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background-image: radial-gradient(
+        ellipse at center,
+        transparent 25%,
+        rgba(0, 0, 0, 0.95) 75%
+      ),
+      url("/r/error_bg.jpeg");
+      background-size: cover, 100% 100%;
+      background-position: center, center;
+      background-repeat: no-repeat, no-repeat;
       color: #333;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
     }
-
+    
     .error-code {
-      color: red;
-      font-size: 64px;
+      color: #d00;
+      width: 1000vw;
+      padding: 1em;
+      background: #000;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 15%,
+        black 85%,
+        transparent 100%
+      );
+      font-size: 1em;
       font-weight: bold;
-      opacity: 0;
+      opacity: 1;
       transform: scale(0.5) translateY(20px);
-      animation: popIn 20.5s ease-out forwards;
+      animation: popIn 5s ease-out forwards;
       text-align: center;
+    }
+
+    .error-code p {
+      color: #a00;
+      width: 50vmin;
+      margin: 0 auto;
+      font-size: 0.5em;
+      font-weight: bold;
     }
 
     @keyframes popIn {
@@ -35,11 +60,12 @@
         opacity: 0;
         transform: scale(0.5) translateY(20px);
       }
-      60% {
+      50% {
         opacity: 1;
         transform: scale(1.05) translateY(-5px);
       }
       100% {
+        opacity: 0.8;
         transform: scale(1) translateY(0);
       }
     }
@@ -52,7 +78,7 @@
   </style>
 </head>
 <body>
-  <div class="error-code">404 Not Found</div>
+  <div class="error-code"><span th:text="${status}"></span> <span th:text="${error}"></span><p th:text="${message}"></p></div>
   <!--
   <div class="error-detail" th:text="'timestamp: ' + ${timestamp}"></div>
   <div class="error-detail" th:text="'status: ' + ${status}"></div>
