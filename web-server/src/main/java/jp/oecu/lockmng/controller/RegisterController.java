@@ -20,7 +20,7 @@ public class RegisterController {
     @GetMapping("/register")
     public String register(@RequestParam(defaultValue = "null") String id) {
         if(!newRegisterService.isValid(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "登録IDが無効です");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Registration Id");
         }
         return "/register/register.html";
     }
