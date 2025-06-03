@@ -26,6 +26,9 @@ public class NewRegister {
     @Column(name = "uuid_str", nullable = false, columnDefinition = "text")
     private String uuid;
 
+    @Column(name = "memo", columnDefinition = "text")
+    private String memo;
+
     @Column(name = "is_enable", nullable = false)
     private boolean isEnable = true;
 

@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 public class NewUserModel {
     @NotNull
+    private String registrationId;
+    @NotNull
     private String userId;
     @NotNull
     private String userName;
