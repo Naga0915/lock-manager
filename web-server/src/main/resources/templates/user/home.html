@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ユーザ用画面</title>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>ユーザ用ページ</title>
+        <!-- ヘッダに追加する場合ここに書く -->
+    </th:block>
 </head>
 <body>
-    <h1>ユーザ用画面</h1>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <!-- ここから内容 -->
+    <h1>ユーザ用ページ</h1>
+    <h2>いらなくないか？</h2>
 </body>
 </html>

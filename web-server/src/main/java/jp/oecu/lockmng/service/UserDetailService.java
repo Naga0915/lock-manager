@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import jp.oecu.lockmng.entity.User;
 import jp.oecu.lockmng.repository.jpa.UserRepository;
+import jp.oecu.lockmng.util.CustomUserDetails;
 
 @Service
 public class UserDetailService implements UserDetailsService{
@@ -24,10 +25,6 @@ public class UserDetailService implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByIdStr(username).orElseThrow(() -> new UsernameNotFoundException("user id=\"" + username + "\" not found"));
-        return new org.springframework.security.core.userdetails.User(
-            user.getIdStr(),
-            user.getPasswordHash(),
-            List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
-        );
+        return new CustomUserDetails(user);
     }
 }

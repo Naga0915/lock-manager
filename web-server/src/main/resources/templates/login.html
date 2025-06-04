@@ -1,45 +1,46 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+  <head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+  <th:block th:fragment="additionalHead">
     <title>ログイン</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script defer src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+  </th:block>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
-    <h1>ログイン画面</h1>
-    <form th:action="@{/login}" method="post">
-        <input type="text" name="username" placeholder="ユーザID" required />
-        <input type="password" name="password" id="inPassword" placeholder="パスワード" required />
-        <button class="btn btn-outline-secondary" type="button" id="toggle-password">
-            <i class="bi bi-eye-slash" id="eyeIcon"></i>
-        </button>
-        <button type="submit">Login</button>
-    </form>
-    <div th:if="${param.s != null and param.s[0] == '0'}">
-    パスワードかユーザーIDが違います
+  <div th:replace="~{fragments/header :: header}"></div>
+  <h1>ログイン画面</h1>
+  <form th:action="@{/login}" method="post">
+    <input type="text" name="userid" placeholder="ユーザID" required />
+    <input type="password" name="password" id="inPassword" placeholder="パスワード" required />
+    <button class="btn btn-outline-secondary" type="button" id="toggle-password">
+      <i class="bi bi-eye-slash" id="eyeIcon"></i>
+    </button>
+    <button type="submit">Login</button>
+  </form>
+  <div th:if="${param.s != null and param.s[0] == '0'}">
+    <div class="alert alert-success" role="alert">
+      メッセージ: パスワードかユーザーIDが違います
     </div>
-    <div th:if="${param.s != null and param.s[0] == '1'}">
-    You have been logged out.
+  </div>
+  <div th:if="${param.s != null and param.s[0] == '1'}">
+    <div class="alert alert-success" role="alert">
+      メッセージ: ログアウトしました
     </div>
+  </div>
+  <script>
+    // eyeIconのclickクリックイベント
+    $("#eyeIcon").on("click", () => {
+      // eyeIconのclass切り替え
+      $("#eyeIcon").toggleClass("bi-eye-slash bi-eye");
 
-    <script>
-      // eyeIconのclickクリックイベント
-      $("#eyeIcon").on("click", () => {
-        // eyeIconのclass切り替え
-        $("#eyeIcon").toggleClass("bi-eye-slash bi-eye");
-
-        // inputのtype切り替え
-        if ($("#inPassword").attr("type") == "password") {
-          $("#inPassword").attr("type", "text");
-        } else {
-          $("#inPassword").attr("type", "password");
-        }
-      });
-    </script>
-    <a href="/reset">パスワードを忘れた方はこちら</a>
+      // inputのtype切り替え
+      if ($("#inPassword").attr("type") == "password") {
+        $("#inPassword").attr("type", "text");
+      } else {
+        $("#inPassword").attr("type", "password");
+      }
+    });
+  </script>
+  <a href="/reset">パスワードを忘れた方はこちら</a>
 </body>
 </html>

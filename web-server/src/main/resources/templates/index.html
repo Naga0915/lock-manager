@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP-Lock</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+  <head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+  <th:block th:fragment="additionalHead">
+    <title>ESP-LOCK</title>
+    <!-- ヘッダに追加する場合ここに書く -->
     <style>
         .TD_Link{
             background-color: #E4F3FF;
@@ -32,15 +31,16 @@
             vertical-align: top;
         }
     </style>
+  </th:block>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
-
+  <div th:replace="~{fragments/header :: header}"></div>
+  <!-- ここから内容 -->
     <div class="container mt-5">
         <div class="text-center">
             <h1>灰の墓所</h1>
 
-            <p>ようこそ、<span th:text="${name}"></span>様</p>
+            <p>ようこそ、<span th:text="${username}"></span>様</p>
             <a href="/user/reser" class="btn btn-primary mb-4">今すぐ予約</a>
 
             <p>あなたの予約状況</p>
@@ -125,6 +125,5 @@
             -->
         </tbody>
     </table>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>
 </html>
