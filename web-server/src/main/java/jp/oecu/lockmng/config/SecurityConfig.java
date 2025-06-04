@@ -32,9 +32,10 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").permitAll() //テスト用
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/register/**").permitAll()
+                .requestMatchers("/reset").permitAll()
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/r/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().denyAll()
             ).formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
