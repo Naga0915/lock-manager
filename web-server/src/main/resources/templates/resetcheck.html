@@ -8,7 +8,7 @@
 <body>
     <h1>メールで送られてきたパスワードの入力画面</h1>
     <form th:action="@{/login}" method="post">
-        <input type="number" name="repassword" id="inrePassword" maxlength="10" required/>
+        <input type="text" name="repassword" id="inrePassword" required/>
         <button type="submit">Login</button>
     </form>
 </body>
