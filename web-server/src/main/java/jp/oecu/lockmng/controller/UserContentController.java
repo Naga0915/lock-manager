@@ -10,14 +10,4 @@ public class UserContentController {
     public String home(){
         return "user/home.html";
     }
-
-    @GetMapping("/user/resv")
-    public String viewResv(){
-        return "user/resv.html";
-    }
-
-    @GetMapping("/user/lock")
-    public String button() {
-        return "user/button.html";
-    }
 }
