@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ログアウト</title>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+  <head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+  <th:block th:fragment="additionalHead">
+    <title>ログアウト失敗</title>
+    <!-- ヘッダに追加する場合ここに書く -->
+  </th:block>
 </head>
 <body>
-    <h1>ログアウト</h1>
+  <div th:replace="~{fragments/header :: header}"></div>
+  <!-- ここから内容 -->
+    <h1>これが見えるならログアウトできてないよ</h1>    
 </body>
 </html>

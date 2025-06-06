@@ -5,26 +5,55 @@
   <title>エラーページ</title>
   <style>
     html, body {
+      font-size: 8vmin;
+      width: 100%;
       height: 100%;
       margin: 0;
       padding: 0;
       font-family: Georgia, serif;
-      background-color: #fff;
+      background-image: radial-gradient(
+        ellipse at center,
+        transparent 25%,
+        rgba(0, 0, 0, 0.95) 75%
+      ),
+      url("/r/error_bg.jpg");
+      background-size: cover, 100% 100%;
+      background-position: center, center;
+      background-repeat: no-repeat, no-repeat;
       color: #333;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
+      overflow-x: hidden;
+    }
+    
+    .error-code {
+      color: #d00;
+      width: 1000vw;
+      padding: 1em;
+      background: #000;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 15%,
+        black 85%,
+        transparent 100%
+      );
+      font-size: 1em;
+      font-weight: bold;
+      opacity: 1;
+      transform: scale(0.5) translateY(20px);
+      animation: popIn 5s ease-out forwards;
+      text-align: center;
     }
 
-    .error-code {
-      color: red;
-      font-size: 64px;
+    .error-code p {
+      color: #a00;
+      width: 50vmin;
+      margin: 0 auto;
+      font-size: 0.5em;
       font-weight: bold;
-      opacity: 0;
-      transform: scale(0.5) translateY(20px);
-      animation: popIn 1.2s ease-out forwards;
-      text-align: center;
     }
 
     @keyframes popIn {
@@ -32,11 +61,12 @@
         opacity: 0;
         transform: scale(0.5) translateY(20px);
       }
-      60% {
+      50% {
         opacity: 1;
-        transform: scale(1.05) translateY(-5px);
+        transform: scale(1.1) translateY(-5px);
       }
       100% {
+        opacity: 0.9;
         transform: scale(1) translateY(0);
       }
     }
@@ -49,16 +79,16 @@
   </style>
 </head>
 <body>
-  <div class="error-code">404 Not Found</div>
-  <!-- <div class="error-detail" th:text="'timestamp: ' + ${timestamp}"></div>
+  <div class="error-code"><span th:text="${status}"></span> <span th:text="${error}"></span><p th:text="${message}"></p></div>
+  <!--
+  <div class="error-detail" th:text="'timestamp: ' + ${timestamp}"></div>
   <div class="error-detail" th:text="'status: ' + ${status}"></div>
   <div class="error-detail" th:text="'error: ' + ${error}"></div>
   <div class="error-detail" th:text="'exception: ' + ${exception}"></div>
   <div class="error-detail" th:text="'message: ' + ${message}"></div>
   <div class="error-detail" th:text="'errors: ' + ${errors}"></div>
   <div class="error-detail" th:text="'trace: ' + ${trace}"></div>
-  <div class="error-detail" th:text="'path: ' + ${path}"></div> -->
+  <div class="error-detail" th:text="'path: ' + ${path}"></div>
+  -->
 </body>
 </html>
-
-<!-- https://qiita.com/niwasawa/items/f3479ef16efa488039fb　これ参照にして作る -->

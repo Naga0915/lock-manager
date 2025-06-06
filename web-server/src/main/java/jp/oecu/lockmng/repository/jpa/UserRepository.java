@@ -11,4 +11,5 @@ import jp.oecu.lockmng.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer>{
     Optional<User> findByIdStr(String idStr);
+    boolean existsByIdStr(String idString);
 }

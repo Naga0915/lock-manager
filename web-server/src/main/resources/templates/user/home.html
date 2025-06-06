@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -49,9 +50,18 @@
     color: #333;
   }
 </style>
+=======
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>ユーザ用ページ</title>
+        <!-- ヘッダに追加する場合ここに書く -->
+    </th:block>
+>>>>>>> e8f006ec14822fd5c6f55af9e304a09d269baf85
 </head>
 
 <body>
+<<<<<<< HEAD
 <h2>ロッカー予約管理</h2>
 
 <!-- ロッカー状況（表を上に） -->
@@ -96,5 +106,11 @@
   </div>
 </div>
 
+=======
+    <div th:replace="~{fragments/header :: header}"></div>
+    <!-- ここから内容 -->
+    <h1>ユーザ用ページ</h1>
+    <h2>いらなくないか？</h2>
+>>>>>>> e8f006ec14822fd5c6f55af9e304a09d269baf85
 </body>
 </html>

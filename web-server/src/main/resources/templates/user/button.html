@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ユーザ用電子錠操作画面</title>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>ユーザ用電子錠操作画面</title>
+        <!-- ヘッダに追加する場合ここに書く -->
+    </th:block>
 </head>
 <body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <!-- ここから内容 -->
     <h1>電子錠の操作画面</h1>
-
+    
     <form id="unlockForm">
         <label for="lockerSelect">ロッカー番号を選択してください:</label>
         <select id="lockerSelect" name="locker">

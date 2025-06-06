@@ -1,26 +1,129 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP-Lock</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+  <head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+  <th:block th:fragment="additionalHead">
+    <title>ESP-LOCK</title>
+    <!-- ヘッダに追加する場合ここに書く -->
+    <style>
+        .TD_Link{
+            background-color: #E4F3FF;
+            cursor: pointer;
+            color: #0066CC;
+            font-weight: bold;
+        }
+
+        .Table_MendanCAL{
+            border-right: 1px solid #CCC;
+            border-bottom: 1px solid #CCC;
+            width: 80%;
+            margin-bottom: 13px;
+            table-layout: fixed;
+        }
+
+        .Table_MendanCAL td {
+            height: 60px;
+            padding: 10px;
+            border-top: 1px solid #CCC;
+            border-left: 1px solid #CCC;
+            background-color: #FFF;
+            color: #666;
+            font-size: 12px;
+            vertical-align: top;
+        }
+    </style>
+  </th:block>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
-
+  <div th:replace="~{fragments/header :: header}"></div>
+  <!-- ここから内容 -->
     <div class="container mt-5">
         <div class="text-center">
             <h1>灰の墓所</h1>
 
-            <p>ようこそ、<span th:text="${name}"></span>様</p>
-            <button type="button" class="btn btn-primary mb-4">今すぐ予約</button>
+            <p>ようこそ、<span th:text="${username}"></span>様</p>
+            <a href="/user/reser" class="btn btn-primary mb-4">今すぐ予約</a>
 
             <p>あなたの予約状況</p>
-            <button type="button" class="btn btn-success">日時・ロッカー番号</button>
+            <a href="/user/resv" class="btn btn-success">日時・ロッカー番号</a>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <h3 style="text-align:center">カレンダーで予約状況を表示</h3>
+    <table border="1" cellpadding="10" cellspacing="0" class="Table_MendanCAL" align="center">
+        <thead>
+            <tr>
+                <th align="center">日</th>
+                <th align="center">月</th>
+                <th align="center">火</th>
+                <th align="center">水</th>
+                <th align="center">木</th>
+                <th align="center">金</th>
+                <th align="center">土</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td>7</td>
+            </tr>
+
+            <tr>
+                <td>8</td>
+                <td>9</td>
+                <td>10</td>
+                <td>11</td>
+                <td>12</td>
+                <td>13</td>
+                <td>14</td>
+            </tr>
+
+            <tr>
+                <td>15</td>
+                <td>16</td>
+                <td>17</td>
+                <td>18</td>
+                <td>19</td>
+                <td>20</td>
+                <td>21</td>
+            </tr>
+
+            <tr>
+                <td>22</td>
+                <td>23</td>
+                <td>24</td>
+                <td>25</td>
+                <td>26</td>
+                <td>27</td>
+                <td>28</td>
+            </tr>
+
+
+            <tr>
+                <td>29</td>
+                <td>30</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <!--
+            <tr>
+            <td ></td>
+            <td ></td>
+            <td ></td>
+            <td ></td>
+            <td ></td>
+            <td ></td>
+            <td ></td>
+            </tr>
+            -->
+        </tbody>
+    </table>
 </body>
 </html>
