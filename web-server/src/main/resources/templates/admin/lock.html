@@ -1,11 +1,80 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理者用電子錠操作画面</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理者用電子錠操作画面</title>
+<style>
+  body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  table {
+    border-collapse: collapse;
+  }
+  td {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #ccc;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .available {
+    background-color: #9f9; /* 緑：空き */
+  }
+  .reserved {
+    background-color: #f99; /* 赤：予約あり */
+  }
+</style>
 </head>
+
 <body>
-    <h1>管理者用の電子錠の操作画面</h1>
+<h1>管理者用の電子錠の操作画面</h1>
+
+<div id="lockerContainer"></div>
+
+<script>
+  const lockerCount = 15; // ←ここを任意に変えられる（サーバーから受け取るイメージ）
+  
+  function createLockerTable(count) {
+    const container = document.getElementById('lockerContainer');
+    container.innerHTML = ''; // クリア
+    
+    const table = document.createElement('table');
+    
+    const columns = 5; // 列数（自由に調整）
+    const rows = Math.ceil(count / columns);
+
+    let lockerNumber = 1;
+    
+    for (let i = 0; i < rows; i++) {
+      const tr = document.createElement('tr');
+      for (let j = 0; j < columns; j++) {
+        const td = document.createElement('td');
+        if (lockerNumber <= count) {
+          td.textContent = lockerNumber; // ロッカー番号を表示
+          td.classList.add('available'); // 仮に全て空きとして
+          td.addEventListener('click', () => {
+            const action = confirm(`ロッカー ${lockerNumber} を開錠しますか？`);
+            if (action) {
+              alert(`ロッカー ${lockerNumber} を開錠しました`);
+              // ここに実際の開錠処理を組み込む（サーバー通信など）
+            }
+          });
+          lockerNumber++;
+        }
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+    container.appendChild(table);
+  }
+  
+  createLockerTable(lockerCount);
+</script>
 </body>
 </html>

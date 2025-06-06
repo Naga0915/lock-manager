@@ -25,13 +25,13 @@ public class SecurityConfig {
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login").permitAll()
-                .requestMatchers("/logout").authenticated()
-                //.requestMatchers("/admin/**").hasRole("ADMIN") //本番用
-                .requestMatchers("/admin/**").permitAll() //テスト用
-                .requestMatchers("/error").permitAll()
-                .requestMatchers("/").permitAll()
-                .anyRequest().authenticated()
+                // .requestMatchers("/login").permitAll()
+                // .requestMatchers("/logout").authenticated()
+                // //.requestMatchers("/admin/**").hasRole("ADMIN") //本番用
+                // .requestMatchers("/admin/**").permitAll() //テスト用
+                // .requestMatchers("/error").permitAll()
+                // .requestMatchers("/").permitAll()
+                .anyRequest().permitAll()
             ).formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
