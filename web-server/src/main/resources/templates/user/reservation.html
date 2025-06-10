@@ -1,14 +1,218 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
-<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
-    <th:block th:fragment="additionalHead">
-        <title>ユーザ用の予約ページ</title>
-        <!-- ヘッダに追加する場合ここに書く -->
-    </th:block>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予約画面</title>
+    <style>
+        #shape-container {
+            border: 1px solid black;
+            width: 80%; /* コンテナの最大幅を設定 */
+            min-height: 50px;
+            /*margin-top: 20px;
+            /*padding: 0;/**/
+            display: flex;
+            /*flex-wrap: wrap; /* 図形が複数生成されたときに折り返す */
+            /*gap: 10px; /* 図形間の余白 */
+            align-items: flex-start;
+            position:relative;
+            left:10%
+        }
+
+        #shape-area {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            /* display: flex; はメッセージ表示に影響するので今回は削除 */
+            /* justify-content: center; */
+            /* align-items: center; */
+        }
+
+        .dynamic-div-shape {
+            height: 50px; /* 高さや他のスタイルは固定でもOK */
+            background-color: #007bff; /* デフォルト色 */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9em;
+            border-radius: 5px;
+            transition: width 0.5s ease; /* 幅の変化をアニメーション */
+            box-sizing: border-box; /* paddingやborderをwidth/heightに含める */
+            flex-shrink: 0; /* 幅が縮まないように */
+            position:absolute;
+        }
+
+        .length-display {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            white-space: nowrap; /* テキストの折り返しを防ぐ */
+            z-index: 20; /* 図形より手前に表示 */
+            pointer-events: none; /* マウスイベントを透過させる */
+            transform: translate(-50%, -120%); /* 図形の上部に中央寄せで表示 */
+        }
+        
+        #square {
+            width: 80%;
+            height: 50px;
+            background: greenyellow;
+            position: relative;
+            left:10%;
+        }
+    </style>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
-    <!-- ここから内容 -->
-     <h1>ユーザ用の予約ページ</h1>
+    <h1>予約画面</h1>
+
+    <div id="square"></div>
+
+    <div id="shape-container">
+        <div id="shape-area">
+            <p class="message" id="status-message">サーバーからのデータ待機中...</p>
+        </div>
+    </div>
+
+    <form th:action="@{/reservation}" method="post">
+        <input type="time" name="StartTime" id = "starttime" value="00:00" required />
+        <input type="time" name="EndTime" id="endtime" value="23:59" required />
+        <button type="submit">予約する</button>
+    </form>
+    <script>
+        //const generateShapeButton = document.getElementById('generateShapeButton');
+        const shapeContainer = document.getElementById('shape-container');
+        const messageDisplay = document.getElementById('message');
+
+        const shapeArea = document.getElementById('shape-area');
+        const statusMessage = document.getElementById('status-message');
+        const activeShapes = new Map(); // アクティブな図形要素をIDで管理
+        let lengthDisplayDiv = null; // 長さ表示用の要素を保持する変数
+
+        const socket = new SockJS('/ws');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            statusMessage.textContent = 'サーバーからのデータ待機中...';
+
+            stompClient.subscribe('/topic/shape-data', function (message) {
+                const receivedShapes = JSON.parse(message.body); // 図形データの配列を受信
+
+                console.log('受信データ:', receivedShapes);
+
+                // --- 既存の図形と新しい図形を比較し、更新・追加・削除を行う ---
+                const newShapeIds = new Set(receivedShapes.map(s => s.id));//IDで図形を特定する
+
+                // 1. 削除する必要がある図形を特定して削除
+                activeShapes.forEach((shapeDiv, id) => {
+                    if (!newShapeIds.has(id)) {
+                        // 新しいデータに含まれていないIDの図形は削除
+                        console.log(`Removing shape with ID: ${id}`);
+                        shapeDiv.removeEventListener('mouseover', showLength);
+                        shapeDiv.removeEventListener('mouseout', hideLength);
+                        shapeArea.removeChild(shapeDiv);
+                        activeShapes.delete(id);
+                        // もし表示中の長さが削除対象の図形のものなら消す
+                        if (lengthDisplayDiv && lengthDisplayDiv.dataset.shapeId === id) {
+                            hideLength();
+                        }
+                    }
+                });
+
+                // 2. 新しい図形を追加または既存の図形を更新
+                if (receivedShapes && receivedShapes.length > 0) {
+                    receivedShapes.forEach(shapeData => {
+                        const id = shapeData.id;
+                        const width = shapeData.width;
+                        const x = shapeData.x;
+
+                        let shapeDiv = activeShapes.get(id);
+
+                        if (!shapeDiv) {
+                            // 新しい図形の場合、要素を作成
+                            shapeDiv = document.createElement('div');
+                            shapeDiv.className = 'dynamic-shape';
+                            shapeDiv.dataset.shapeId = id; // データ属性にIDを保存
+                            shapeArea.appendChild(shapeDiv);
+                            activeShapes.set(id, shapeDiv);
+
+                            // マウスイベントリスナーを追加
+                            shapeDiv.addEventListener('mouseover', showLength);
+                            shapeDiv.addEventListener('mouseout', hideLength);
+                        }
+
+                        // 幅と位置を更新
+                        shapeDiv.style.width = `${width}%`;
+                        shapeDiv.style.left = `${x}%`;
+                        shapeDiv.style.top = `50px`;
+                        shapeDiv.dataset.currentWidth = width; // データ属性に現在の幅を保存
+                        shapeDiv.dataset.currentX = x; // データ属性に現在のXを保存
+                    });
+
+                    statusMessage.textContent = `図形が表示されました (${receivedShapes.length}個)`;
+                    statusMessage.style.display = 'none';
+
+                } else {
+                    // 受信した図形が空の配列の場合、すべての図形を削除
+                    activeShapes.forEach((shapeDiv, id) => {
+                        console.log(`Removing remaining shape with ID: ${id}`);
+                        shapeDiv.removeEventListener('mouseover', showLength);
+                        shapeDiv.removeEventListener('mouseout', hideLength);
+                        shapeArea.removeChild(shapeDiv);
+                    });
+                    activeShapes.clear();
+                    hideLength();
+                    statusMessage.textContent = 'サーバーからデータが消失しました。図形は消えました。';
+                    statusMessage.style.display = 'block';
+                }
+            });
+        }, function (error) {
+            console.error('STOMP error:', error);
+            statusMessage.textContent = 'STOMP 接続エラーが発生しました。';
+            statusMessage.style.display = 'block';
+        });
+
+        window.addEventListener('beforeunload', function() {//タブ削除時にコネクションを切る
+            if (stompClient.connected) {
+                stompClient.disconnect();
+                console.log('Disconnected from STOMP server.');
+            }
+        });
+
+        function showLength(event) {//詳細を表示
+            const targetShape = event.target; // カーソルが当たった図形要素
+            const width = targetShape.dataset.currentWidth; // 保存した幅を取得
+            const shapeId = targetShape.dataset.shapeId; // 図形のIDを取得
+
+            if (!lengthDisplayDiv) {
+                lengthDisplayDiv = document.createElement('div');
+                lengthDisplayDiv.className = 'length-display';
+                document.body.appendChild(lengthDisplayDiv);
+            }
+
+            // どの図形の長さかを示すためにIDも保存
+            lengthDisplayDiv.dataset.shapeId = shapeId;
+            lengthDisplayDiv.textContent = `幅: ${width}px`;
+
+            // 図形の位置に合わせて表示要素の位置を調整
+            const rect = targetShape.getBoundingClientRect();
+            lengthDisplayDiv.style.left = `${rect.left + rect.width / 2}px`;
+            lengthDisplayDiv.style.top = `${rect.top}px`;
+            lengthDisplayDiv.style.display = 'block';
+        }
+
+        function hideLength() {//詳細を非表示
+            if (lengthDisplayDiv) {
+                lengthDisplayDiv.style.display = 'none';
+                lengthDisplayDiv.dataset.shapeId = ''; // IDをクリア
+            }
+        }
+    </script>
+
 </body>
 </html>
