@@ -143,4 +143,9 @@ public class AdminController {
     public String viewResv(){
         return "admin/resv.html";
     }
+
+    @GetMapping("/admin/reservation")
+    public String viewReservation(){
+        return "admin/reservation.html";
+    }
 }

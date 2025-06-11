@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>てすとだよ</title>
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <!-- ヘッダに追加する場合ここに書く -->
+    </th:block>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <button onclick="sub()">qwrwr3e</button>
+    <form th:action="@{/resv}" method="post">
+        <input type="datetime-local" name="startTime" />
+        <input type="datetime-local" name="endTime" />
+        <input type="number" name="lockId" />
+        <input type="submit" />
+    </form>
+    <script>
+        function sub(){
+            const token = document.querySelector('meta[name="_csrf"]').content;
+            const header = document.querySelector('meta[name="_csrf_header"]').content;
+            fetch('/api/resv/get', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [header]: token
+            },
+            body: JSON.stringify({
+                year: 2025,
+                month: 6,
+                day: 11,
+                lockId: 1
+            })
+            });
+        }
+    </script>
+</body>
+</html>

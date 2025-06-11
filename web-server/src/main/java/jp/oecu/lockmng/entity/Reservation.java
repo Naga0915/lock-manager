@@ -1,6 +1,7 @@
 package jp.oecu.lockmng.entity;
 
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,10 +25,10 @@ public class Reservation {
     private Integer id;
 
     @Column(name = "start_time_utc", nullable = false)
-    private OffsetDateTime startTimeUtc;
+    private ZonedDateTime startTimeUtc;
 
     @Column(name = "end_time_utc", nullable = false)
-    private OffsetDateTime endTimeUtc;
+    private ZonedDateTime endTimeUtc;
 
     @Column(name = "user_id", nullable = false)
     private Integer userId;
