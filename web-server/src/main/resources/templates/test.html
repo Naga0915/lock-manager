@@ -6,35 +6,144 @@
         <meta name="_csrf" th:content="${_csrf.token}" />
         <meta name="_csrf_header" th:content="${_csrf.headerName}" />
         <!-- ヘッダに追加する場合ここに書く -->
+         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha256-BRqBN7dYgABqtY9Hd4ynE+1slnEw+roEPFzQ7TRRfcg=" crossorigin="anonymous"></script>
+        <!-- Tempus Dominus JavaScript -->
+        <script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/js/tempus-dominus.min.js" crossorigin="anonymous"></script>
+
+        <!-- Tempus Dominus Styles -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/css/tempus-dominus.min.css" crossorigin="anonymous">
     </th:block>
 </head>
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
-    <button onclick="sub()">qwrwr3e</button>
-    <form th:action="@{/resv}" method="post">
+    <input type="date" id="dateInput" />
+    <input type="number" id="lockIdInput" placeholder="Lock ID" />
+    <button onclick="sub()">送信</button>
+    <table class="table table-bordered mt-4">
+    <thead>
+        <tr>
+        <th>#</th>
+        <th>開始</th>
+        <th>終了</th>
+        </tr>
+    </thead>
+    <tbody id="resvTableBody">
+        <!-- データがここに入る -->
+    </tbody>
+    </table>
+<script>
+  function toTimeString(dayFraction) {
+    const totalMinutes = Math.round(dayFraction * 24 * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
+  function sub() {
+    const token = document.querySelector('meta[name="_csrf"]').content;
+    const header = document.querySelector('meta[name="_csrf_header"]').content;
+
+    const dateStr = document.getElementById('dateInput').value;
+    const lockId = parseInt(document.getElementById('lockIdInput').value);
+
+    if (!dateStr || isNaN(lockId)) {
+      alert("日付とLock IDを正しく入力してください");
+      return;
+    }
+
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    fetch('/api/resv/get', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        [header]: token
+      },
+      body: JSON.stringify({ year, month, day, lockId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const tbody = document.getElementById('resvTableBody');
+      tbody.innerHTML = ""; // テーブル初期化
+
+      if (data.success && Array.isArray(data.list)) {
+        data.list.forEach((pair, index) => {
+          const row = document.createElement("tr");
+
+          const indexCell = document.createElement("td");
+          indexCell.textContent = index + 1;
+          row.appendChild(indexCell);
+
+          const startCell = document.createElement("td");
+          startCell.textContent = toTimeString(pair[0]);
+          row.appendChild(startCell);
+
+          const endCell = document.createElement("td");
+          endCell.textContent = toTimeString(pair[1]);
+          row.appendChild(endCell);
+
+          tbody.appendChild(row);
+        });
+      } else {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 3;
+        cell.textContent = "データが見つかりません";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+      }
+    })
+    .catch(error => {
+      console.error("通信エラー:", error);
+      alert("サーバーとの通信に失敗しました");
+    });
+  }
+</script>
+    <!-- <form th:action="@{/resv}" method="post">
         <input type="datetime-local" name="startTime" />
         <input type="datetime-local" name="endTime" />
         <input type="number" name="lockId" />
         <input type="submit" />
+    </form> -->
+    <form id="resvForm" th:action="@{/resv}" method="post">
+        <input type="datetime-local" name="startTimeLocal" id="startTime" />
+        <input type="datetime-local" name="endTimeLocal" id="endTime" />
+        <input type="number" name="lockId" />
+
+        <!-- UTC形式で送信する hidden inputs -->
+        <input type="hidden" name="startTime" id="startTimeUtc" />
+        <input type="hidden" name="endTime" id="endTimeUtc" />
+
+        <input type="submit" />
     </form>
+
     <script>
-        function sub(){
-            const token = document.querySelector('meta[name="_csrf"]').content;
-            const header = document.querySelector('meta[name="_csrf_header"]').content;
-            fetch('/api/resv/get', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                [header]: token
-            },
-            body: JSON.stringify({
-                year: 2025,
-                month: 6,
-                day: 11,
-                lockId: 1
-            })
-            });
-        }
+        document.getElementById('resvForm').addEventListener('submit', function (e) {
+            const startLocal = document.getElementById('startTime').value;
+            const endLocal = document.getElementById('endTime').value;
+
+            // ローカル時刻 → Dateオブジェクト → UTC文字列
+            if (startLocal) {
+            const startDate = new Date(startLocal);
+            document.getElementById('startTimeUtc').value = startDate.toISOString(); // e.g. "2025-06-12T04:00:00.000Z"
+            }
+
+            if (endLocal) {
+            const endDate = new Date(endLocal);
+            document.getElementById('endTimeUtc').value = endDate.toISOString();
+            }
+
+            // 元の datetime-local の name を変えてあるので、hidden input の値だけが送信される
+        });
     </script>
+    
+    <div th:if="${msg != null}">
+        <div class="alert alert-success" role="alert">
+            メッセージ: <span th:text="${msg}"></span>
+        </div>
+    </div>
 </body>
 </html>

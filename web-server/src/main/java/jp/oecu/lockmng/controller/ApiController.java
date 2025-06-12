@@ -1,6 +1,7 @@
 package jp.oecu.lockmng.controller;
 
 import java.time.DateTimeException;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,6 +48,7 @@ public class ApiController {
         ZonedDateTime start;
         try{
             start = ZonedDateTime.of(model.getYear(), model.getMonth(), model.getDay(), 0, 0, 0, 0, timeZoneConfig.getZoneId());
+            start = start.withZoneSameInstant(ZoneId.of("UTC"));
         }catch(DateTimeException e){
             result.setSuccess(false);
             result.setMessage(e.getLocalizedMessage());

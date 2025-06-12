@@ -1,9 +1,11 @@
 package jp.oecu.lockmng.config;
 
 import java.time.ZoneId;
+import java.util.TimeZone;
 
 import org.springframework.context.annotation.Configuration;
 
+import jakarta.annotation.PostConstruct;
 import jp.oecu.lockmng.config.properties.AppCommonConfig;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -27,4 +29,8 @@ public class TimeZoneConfig {
         this.zoneId = temp;
     }
 
+    @PostConstruct
+    public void init(){
+        TimeZone.setDefault(TimeZone.getTimeZone(zoneId.getId()));
+    }
 }
