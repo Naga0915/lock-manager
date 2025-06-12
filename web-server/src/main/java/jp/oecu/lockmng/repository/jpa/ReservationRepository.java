@@ -13,27 +13,56 @@ import jp.oecu.lockmng.entity.Reservation;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     @Query("""
-    SELECT CASE WHEN COUNT(r) > 0 THEN TRUE ELSE FALSE END
-    FROM Reservation r
-    WHERE r.startTimeUtc < :end
-      AND r.endTimeUtc > :start
-      AND r.lockId = :lockId
+        SELECT r
+        FROM Reservation r
+        WHERE r.startTimeUtc < :end
+        AND r.endTimeUtc > :start
+        AND r.lockId = :lockId
     """)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public boolean hasOverlap(@Param("start") ZonedDateTime start, @Param("end") ZonedDateTime end, @Param("lockId") Integer lockId);
+    public List<Reservation> findByPeriodWrite(
+        @Param("start") ZonedDateTime start, 
+        @Param("end") ZonedDateTime end, 
+        @Param("lockId") Integer lockId
+    );
 
     @Query("""
-    SELECT r
-    FROM Reservation r
-    WHERE r.startTimeUtc < :end
-      AND r.endTimeUtc > :start
-      AND r.lockId = :lockId
+        SELECT r
+        FROM Reservation r
+        WHERE r.startTimeUtc < :end
+        AND r.endTimeUtc > :start
+        AND r.lockId = :lockId
+    """)
+    public List<Reservation> findByPeriodRead(
+        @Param("start") ZonedDateTime start, 
+        @Param("end") ZonedDateTime end, 
+        @Param("lockId") Integer lockId
+    );
+    
+    @Query("""
+        SELECT COUNT(r)
+        FROM Reservation r
+        WHERE r.startTimeUtc < :end
+        AND r.endTimeUtc > :start
+        AND r.lockId = :lockId
     """)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public List<Reservation> findByPeriod(@Param("start") ZonedDateTime start, @Param("end") ZonedDateTime end, @Param("lockId") Integer lockId);
+    public long countOverlapWrite(
+        @Param("start") ZonedDateTime start,
+        @Param("end") ZonedDateTime end,
+        @Param("lockId") Integer lockId
+    );
 
-    @Lock(LockModeType.PESSIMISTIC_READ)
-    public List<Reservation> findAll();
-
-    //public void save(Reservation reservation);
+    @Query("""
+        SELECT COUNT(r)
+        FROM Reservation r
+        WHERE r.startTimeUtc < :end
+        AND r.endTimeUtc > :start
+        AND r.lockId = :lockId
+    """)
+    public boolean countOverlapRead(
+        @Param("start") ZonedDateTime start,
+        @Param("end") ZonedDateTime end,
+        @Param("lockId") Integer lockId
+    );
 }
