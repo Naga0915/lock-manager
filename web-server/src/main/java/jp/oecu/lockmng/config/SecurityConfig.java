@@ -37,6 +37,10 @@ public class SecurityConfig {
                 // .requestMatchers("/").permitAll()
                 // .requestMatchers("/r/**").permitAll()
                 .anyRequest().permitAll()
+            ).headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions
+                    .sameOrigin() // 同じオリジンからのフレーム埋め込みを許可
+                )
             ).formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
