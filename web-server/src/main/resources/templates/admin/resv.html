@@ -1,11 +1,37 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理者用予約状況確認画面</title>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>管理者用予約状況確認画面</title>
+        <!-- ヘッダに追加する場合ここに書く -->
+    </th:block>
 </head>
 <body>
+    <div th:replace="~{fragments/header :: header}"></div>
     <h1>管理者用予約状況確認画面</h1>
+    <div th:if="${msg != null}">
+        <div class="alert alert-success" role="alert">
+            メッセージ: <span th:text="${msg}"></span>
+        </div>
+    </div>
+    <table class="table" th:if="${list != null}">
+        <thead>
+            <tr>
+                <th>開始時刻</th>
+                <th>終了時刻</th>
+                <th>ユーザID</th>
+                <th>ロックID</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="li : ${list}">
+                <td th:text="${li.startTimeUtc}"></td>
+                <td th:text="${li.endTimeUtc}"></td>
+                <td th:text="${li.userId}"></td>
+                <td th:text="${li.lockId}"></td>
+            </tr>
+        </tbody>
+    </table>
+
 </body>
 </html>

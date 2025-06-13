@@ -1,18 +1,21 @@
 package jp.oecu.lockmng.model;
 
-import java.time.ZonedDateTime;
+import java.io.Serializable;
+import java.time.Instant;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Valid
 @Data
-public class NewReserveModel {
+public class NewReserveModel implements Serializable{
     @NotNull
-    private ZonedDateTime startTime;
+    private Instant startTime;
     @NotNull
-    private ZonedDateTime endTime;
+    private Instant endTime;
     @NotNull
-    private int lockerId;
+    @Positive
+    private int lockId;
 }

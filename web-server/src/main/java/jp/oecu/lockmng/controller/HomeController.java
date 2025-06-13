@@ -5,6 +5,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @Controller
@@ -27,4 +29,10 @@ public class HomeController {
     public String getHead(Model model) {
         return "fragments/head.html";
     }
+
+    @GetMapping("/test/1")
+    public String test1() {
+        return "test.html";
+    }
+    
 }

@@ -8,10 +8,10 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Component
-@ConfigurationProperties(prefix = "app.user.register")
+@ConfigurationProperties(prefix = "app.lock")
 @Data
 @Validated
-public class RegisterConfig {
+public class LockConfig {
     @Positive
-    private int expire_hour = 24;
+    private Integer num = 4;
 }
