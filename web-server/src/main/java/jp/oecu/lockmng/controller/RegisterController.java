@@ -31,10 +31,11 @@ public class RegisterController {
     }
 
     @GetMapping("/register")
-    public String register(@RequestParam(defaultValue = "null") String id) {
+    public String register(@RequestParam(defaultValue = "null") String id, Model model) {
         if(!newRegisterService.isValid(id)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Registration Id");
         }
+        model.addAttribute("id", id);
         return "/register/register.html";
     }
 
@@ -64,6 +65,4 @@ public class RegisterController {
     public String success() {
         return "/register/success.html";
     }
-    
-    
 }

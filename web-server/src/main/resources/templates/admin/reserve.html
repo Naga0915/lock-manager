@@ -2,7 +2,7 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
 <head th:replace="~{fragments/head :: head(~{::additionalHead})}">
     <th:block th:fragment="additionalHead">
-        <title>てすとだよ</title>
+        <title>管理者用予約画面</title>
         <meta name="_csrf" th:content="${_csrf.token}" />
         <meta name="_csrf_header" th:content="${_csrf.headerName}" />
         <!-- ヘッダに追加する場合ここに書く -->
@@ -12,14 +12,14 @@
     <div th:replace="~{fragments/header :: header}"></div>
     <input type="date" id="dateInput" />
     <input type="number" id="lockIdInput" placeholder="Lock ID" />
-    <button onclick="sub()">送信</button>
+    <button onclick="sub()">予約状況確認</button>
     <table class="table table-bordered mt-4">
     <thead>
-      <tr>
+        <tr>
         <th>#</th>
         <th>開始</th>
         <th>終了</th>
-      </tr>
+        </tr>
     </thead>
     <tbody id="resvTableBody">
         <!-- データがここに入る -->
@@ -96,7 +96,7 @@
     });
   }
 </script>
-    <form id="resvForm" th:action="@{/resv}" method="post">
+    <form id="resvForm" th:action="@{/admin/resv}" method="post">
         <input type="datetime-local" name="startTimeLocal" id="startTime" />
         <input type="datetime-local" name="endTimeLocal" id="endTime" />
         <input type="number" name="lockId" />

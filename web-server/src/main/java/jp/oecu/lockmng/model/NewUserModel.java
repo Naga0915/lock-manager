@@ -21,4 +21,6 @@ public class NewUserModel {
     private String password;
     @NotNull
     private String passwordCheck;
+    @NotNull
+    private Boolean disclaimed;
 }

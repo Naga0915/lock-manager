@@ -42,6 +42,9 @@ public class UserService {
         if(!model.getPassword().equals(model.getPasswordCheck())){
             return Optional.of("パスワードが一致しません。");
         }
+        if(!model.getDisclaimed()){
+            return Optional.of("免責事項に同意してください");
+        }
         if(model.getPassword().length() > passwordConfig.getLength_max() || model.getPassword().length() < passwordConfig.getLength_min()){
             return Optional.of(String.format("パスワードは%d文字以上%d文字以下", passwordConfig.getLength_min(), passwordConfig.getLength_max()));
         }

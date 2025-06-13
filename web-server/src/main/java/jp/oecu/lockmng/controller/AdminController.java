@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,10 +20,13 @@ import jp.oecu.lockmng.config.properties.ReservationConfig;
 import jp.oecu.lockmng.entity.NewRegister;
 import jp.oecu.lockmng.entity.User;
 import jp.oecu.lockmng.model.NewRegisterModel;
+import jp.oecu.lockmng.model.NewReserveModel;
 import jp.oecu.lockmng.model.NewUserModel;
 import jp.oecu.lockmng.model.RegisterChangeStatModel;
 import jp.oecu.lockmng.service.NewRegisterService;
+import jp.oecu.lockmng.service.ReservationService;
 import jp.oecu.lockmng.service.UserService;
+import jp.oecu.lockmng.util.CustomUserDetails;
 import jp.oecu.lockmng.util.Result;
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,13 +40,15 @@ public class AdminController {
     private final UserService userService;
     private final NewRegisterService newRegisterService;
     private final AppCommonConfig appCommonConfig;
+    private final ReservationService reservationService;
     
     @Autowired
-    public AdminController(UserService userService, NewRegisterService newRegisterService, AppCommonConfig appCommonConfig, ReservationConfig reservationConfig){
+    public AdminController(UserService userService, NewRegisterService newRegisterService, AppCommonConfig appCommonConfig, ReservationConfig reservationConfig, ReservationService reservationService){
         this.userService = userService;
         this.newRegisterService = newRegisterService;
         this.appCommonConfig = appCommonConfig;
         this.reservationConfig = reservationConfig;
+        this.reservationService = reservationService;
     }
 
     @GetMapping("/admin")
@@ -133,19 +139,37 @@ public class AdminController {
         return "redirect:/admin/register";
     }
     
-    
     @GetMapping("/admin/lock")
     public String lock(){
         return "admin/lock.html";
     }
 
     @GetMapping("/admin/resv")
-    public String viewResv(){
-        return "admin/resv.html";
+    public String reserveAdmin() {
+        return "admin/reserve.html";
     }
 
-    @GetMapping("/admin/reservation")
-    public String viewReservation(){
-        return "admin/reservation.html";
+    @PostMapping("/admin/resv")
+    public String reserveAdminPost(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute NewReserveModel newReserveModel, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            StringBuilder sb = new StringBuilder();
+            for (FieldError e : bindingResult.getFieldErrors()) {
+                sb.append(e.getDefaultMessage() + "\n");
+            }
+            redirectAttributes.addFlashAttribute("msg", bindingResult);
+            return "redirect:/admin/resv";
+        }
+        //サービスの処理
+        if(userDetails == null){
+            redirectAttributes.addFlashAttribute("msg", "ログインしてください");
+            return "redirect:/admin/resv";
+        }
+        Result<Boolean> result = reservationService.newReserve(newReserveModel, userDetails.getUser());
+        if(result.isSuccess()){
+            redirectAttributes.addFlashAttribute("msg", "予約完了しました");
+        }else{
+            redirectAttributes.addFlashAttribute("msg", result.getError());
+        }
+        return "redirect:/admin/resv";
     }
 }
