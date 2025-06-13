@@ -10,7 +10,7 @@
   <div th:replace="~{fragments/header :: header}"></div>
   <!-- ここから内容 -->
     <h1>パスワード再設定</h1>
-    <form th:action="@{/admin/user/new}" method="post">
+    <form th:action="@{/#}" method="post">
         <input type="password" name="password" placeholder="パスワード" required />
         <input type="password" name="passwordCheck" placeholder="パスワード確認" required />
         <button type="submit">Login</button>
