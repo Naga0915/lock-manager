@@ -42,6 +42,24 @@ public class NewRegisterService {
         return newRegisterRepository.findByUuid(uuid);
     }
 
+    public Optional<String> setStatusById(String uuid, boolean status, String userAgent, String ipAddress, String userId){
+        try{
+            Optional<NewRegister> result = newRegisterRepository.findByUuid(uuid);
+            if(!result.isPresent()){
+                return Optional.of("無効なUUID");
+            }
+            NewRegister entity = result.get();
+            entity.setEnable(status);
+            entity.setIpAddress(ipAddress);
+            entity.setUserAgent(userAgent);
+            entity.setIdStr(userId);
+            newRegisterRepository.save(entity);
+        }catch(Exception e){
+            return Optional.of("変更を保存できません");
+        }
+        return Optional.empty();
+    }
+
     public Optional<String> setStatusById(String uuid, boolean status){
         try{
             Optional<NewRegister> result = newRegisterRepository.findByUuid(uuid);
