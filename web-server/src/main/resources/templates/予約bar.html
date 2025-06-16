@@ -35,9 +35,10 @@
         <span class="position-absolute top-50 end-0 translate-middle-y ms-3">24:00</span>
     </div>
     <div id="shape-container" class="d-flex flex-wrap border rounded shape-container-bs"></div>
-<script>
+    <p id="message"></p>
 
-  setInterval(sub(), 10000)
+<script>
+  setInterval(sub(), 10000)//10秒に1回予約状況を更新
   function sub() {
     const token = document.querySelector('meta[name="_csrf"]').content;
     const header = document.querySelector('meta[name="_csrf_header"]').content;
@@ -53,7 +54,7 @@
     .then(response => response.json())
     .then(data => {
       if (data.success && Array.isArray(data.list)) {
-        data.list.forEach((pair, index) => {
+        data.list.forEach((pair, index) => {//予約状況を示すバーの生成
           const newShape = document.createElement('div');
           newShape.classList.add('dynamic-div-shape');
           newShape.style.width = `${(pair[1]-pair[0])*100}%`;
@@ -63,12 +64,7 @@
           shapeContainer.appendChild(newShape);
         });
       } else {
-        const row = document.createElement("tr");
-        const cell = document.createElement("td");
-        cell.colSpan = 3;
-        cell.textContent = "データが見つかりません";
-        row.appendChild(cell);
-        tbody.appendChild(row);
+        messageDisplay.textContent = '図形を生成できませんでした。';
       }
     })
     .catch(error => {
@@ -76,6 +72,8 @@
       alert("サーバーとの通信に失敗しました");
     });
   }
+
+  sub();
 </script>
     <div th:if="${msg != null}">
         <div class="alert alert-success" role="alert">
