@@ -1,9 +1,15 @@
 package jp.oecu.lockmng.config.properties;
 
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
@@ -18,4 +24,11 @@ public class ReservationConfig {
     private int min_duration_minute = 5;
     @Positive
     private int max_duration_minute = 1440;
+    @NotNull
+    private LocalTime available_start = LocalTime.MIDNIGHT;
+    @NotNull
+    private LocalTime available_end = LocalTime.MIDNIGHT;
+    @NotNull
+    @Min(0)
+    private int divided_time_minute = 0;
 }

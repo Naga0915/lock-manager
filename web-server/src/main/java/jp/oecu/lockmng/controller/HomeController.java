@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
-
 @Controller
 public class HomeController {
     @GetMapping("/")
@@ -35,4 +34,8 @@ public class HomeController {
         return "test.html";
     }
     
+    @GetMapping("/disclaimer")
+    public String getDisclaimer() {
+        return "disclaimer.html";
+    }
 }

@@ -1,5 +1,6 @@
 package jp.oecu.lockmng.service;
 
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -77,6 +78,18 @@ public class ReservationService {
             if(endTime.minusMinutes(reservationConfig.getMin_duration_minute()).isBefore(startTime) || endTime.minusMinutes(reservationConfig.getMax_duration_minute()).isAfter(startTime)){
                 return Result.error(String.format("予約は%d分間以上%d分間以内の期間である必要があります", reservationConfig.getMin_duration_minute(), reservationConfig.getMax_duration_minute()));
             }
+            if(reservationConfig.getDivided_time_minute() > 0){
+                startTime = floorZonedDateTime(startTime, reservationConfig.getDivided_time_minute());
+                endTime = floorZonedDateTime(endTime, reservationConfig.getDivided_time_minute());
+            }
+            if(!reservationConfig.getAvailable_start().equals(reservationConfig.getAvailable_end())){
+                if(startTime.toLocalTime().isBefore(reservationConfig.getAvailable_start())){
+                    return Result.error(String.format("予約は %s 以降を指定してください", reservationConfig.getAvailable_start().toString()));
+                }
+                if(endTime.toLocalTime().isAfter(reservationConfig.getAvailable_end())){
+                    return Result.error(String.format("予約は %s 以前を指定してください", reservationConfig.getAvailable_end().toString()));
+                }
+            }
             Reservation r = new Reservation();
             r.setLockId(model.getLockId());
             r.setStartTimeUtc(startTime);
@@ -88,5 +101,15 @@ public class ReservationService {
             log.error("新規予約時に予約サービスでエラー", e);
             return Result.error(e.getLocalizedMessage());
         }
+    }
+
+    public static ZonedDateTime floorZonedDateTime(ZonedDateTime dateTime, int minutesUnit) {
+        int minute = dateTime.getMinute();
+        int flooredMinute = (minute / minutesUnit) * minutesUnit;
+
+        return dateTime
+            .withMinute(flooredMinute)
+            .withSecond(0)
+            .withNano(0);
     }
 }

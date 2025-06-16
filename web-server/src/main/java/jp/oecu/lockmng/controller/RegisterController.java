@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jp.oecu.lockmng.model.NewUserModel;
 import jp.oecu.lockmng.service.NewRegisterService;
 import jp.oecu.lockmng.service.UserService;
@@ -31,15 +32,16 @@ public class RegisterController {
     }
 
     @GetMapping("/register")
-    public String register(@RequestParam(defaultValue = "null") String id) {
+    public String register(@RequestParam(defaultValue = "null") String id, Model model) {
         if(!newRegisterService.isValid(id)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Registration Id");
         }
+        model.addAttribute("id", id);
         return "/register/register.html";
     }
 
     @PostMapping("/register")
-    public String registerPost(@ModelAttribute NewUserModel userModel, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String registerPost(@ModelAttribute NewUserModel userModel, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes, HttpServletRequest request) {
         if(!newRegisterService.isValid(userModel.getRegistrationId())){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Registration Id");
         }
@@ -56,6 +58,14 @@ public class RegisterController {
             redirectAttributes.addFlashAttribute("msg", result.get());
             return "redirect:/register";
         }
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        } else {
+            // X-Forwarded-Forはカンマ区切りで複数IPが来ることがあるので先頭を使う
+            ip = ip.split(",")[0].trim();
+        }
+        newRegisterService.setStatusById(userModel.getRegistrationId(), false, request.getHeader("User-Agent"), ip, userModel.getUserId());
 
         return "redirect:/register/success";
     }
@@ -64,6 +74,4 @@ public class RegisterController {
     public String success() {
         return "/register/success.html";
     }
-    
-    
 }
