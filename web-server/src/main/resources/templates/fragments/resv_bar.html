@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>てすとだよ</title>
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <meta name="param_year" th:content="${year}" />
+        <meta name="param_month" th:content="${month}" />
+        <meta name="param_day" th:content="${day}" />
+        <meta name="param_lockNum" th:content="${lockNum}" />
+        <!-- ヘッダに追加する場合ここに書く -->
+        <style>
+            .shape-container-bs {
+                height: 50px;
+            }
+
+            .dynamic-div-shape {
+                height:50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position:absolute;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div class="w-100 p-3 position-relative" style="background-color: greenyellow;">
+        <span class="position-absolute top-50 start-0 translate-middle-y ms-3">00:00</span>
+        <span class="position-absolute top-50 start-50 translate-middle-y ms-3">12:00</span>
+        <span class="position-absolute top-50 end-0 translate-middle-y ms-3">24:00</span>
+    </div>
+    <div id="shape-container" class="d-flex flex-column gap-2"></div>
+    <p id="message"></p>
+
+<script>
+  setInterval(sub, 10000);
+  function sub() {
+    const token = document.querySelector('meta[name="_csrf"]').content;
+    const header = document.querySelector('meta[name="_csrf_header"]').content;
+    const year = document.querySelector('meta[name="param_year"]').content;
+    const month = document.querySelector('meta[name="param_month"]').content;
+    const day = document.querySelector('meta[name="param_day"]').content;
+    const lockNum = parseInt(document.querySelector('meta[name="param_lockNum"]').content, 10);
+
+    const shapeContainer = document.getElementById("shape-container");
+    const messageDisplay = document.getElementById("message");
+
+    const tooltipTriggerList = shapeContainer.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach(el => {
+        const tooltipInstance = bootstrap.Tooltip.getInstance(el);
+        if (tooltipInstance) {
+        tooltipInstance.dispose();
+        }
+    });
+
+    shapeContainer.innerHTML = "";
+
+    for (let lockId = 0; lockId < lockNum; lockId++) {
+      const rowContainer = document.createElement('div');
+      rowContainer.classList.add('position-relative', 'shape-container-bs', 'border', 'rounded');
+      rowContainer.setAttribute('data-lock-id', lockId);
+
+      shapeContainer.appendChild(rowContainer);
+
+      fetch('/api/resv/get', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          [header]: token
+        },
+        body: JSON.stringify({ year, month, day, lockId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.list)) {
+          data.list.forEach((pair) => {
+            const newShape = document.createElement('div');
+            newShape.classList.add('dynamic-div-shape');
+            newShape.style.width = `${(pair[1] - pair[0]) * 100}%`;
+            newShape.style.left = `${pair[0] * 100}%`;
+            newShape.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+            newShape.title = `鍵ID: ${lockId}`;
+
+            const startTime = formatTime(pair[0]);
+            const endTime = formatTime(pair[1]);
+
+            newShape.setAttribute("data-bs-toggle", "tooltip");
+            newShape.setAttribute("data-bs-placement", "top");
+            newShape.setAttribute("title", `鍵 ${lockId}: ${startTime} ～ ${endTime}`);
+
+            rowContainer.appendChild(newShape);
+            new bootstrap.Tooltip(newShape);
+          });
+        } else {
+          const msg = document.createElement('div');
+          msg.textContent = `鍵 ${lockId}: 図形を生成できませんでした`;
+          rowContainer.appendChild(msg);
+        }
+      })
+      .catch(error => {
+        console.error("通信エラー:", error);
+        alert(`鍵 ${lockId} の読み込みに失敗しました`);
+      });
+    }
+  }
+
+  function formatTime(fraction) {
+    const minutesTotal = Math.round(fraction * 24 * 60);
+    const hours = Math.floor(minutesTotal / 60);
+    const minutes = minutesTotal % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  }
+
+  sub();
+</script>
+    <div th:if="${msg != null}">
+        <div class="alert alert-success" role="alert">
+            メッセージ: <span th:text="${msg}"></span>
+        </div>
+    </div>
+</body>
+</html>

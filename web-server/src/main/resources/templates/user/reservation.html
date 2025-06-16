@@ -8,14 +8,31 @@
 </head>
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
-    <form id="resvForm" th:action="@{/admin/resv}" method="post">
-        <input type="datetime-local" name="startTimeLocal" id="startTime" />
-        <input type="datetime-local" name="endTimeLocal" id="endTime" />
-        <input type="number" name="lockId" />
+    <form id="resvForm" th:action="@{/user/resv}" method="post">
+        <label>開始時刻: <input type="datetime-local" name="startTimeLocal" id="startTime" /></label>
+        <label>終了時刻: <input type="datetime-local" name="endTimeLocal" id="endTime" /></label>
+        <label>Lock ID: <input type="number" name="lockId" /></label>
         <input type="hidden" name="startTime" id="startTimeUtc" />
         <input type="hidden" name="endTime" id="endTimeUtc" />
-        <input type="submit" />
+        <input type="submit" value="予約送信" />
     </form>
+    <div th:if="${msg != null}">
+        <div class="alert alert-success" role="alert">
+            メッセージ: <span th:text="${msg}"></span>
+        </div>
+    </div>
+    <hr>
+    <!-- iframeで予約状況を表示 -->
+    <div>
+        <h4>予約状況を表示</h4>
+        <label>年: <input type="number" id="yearInput" min="2000" max="2100" /></label>
+        <label>月: <input type="number" id="monthInput" min="1" max="12" /></label>
+        <label>日: <input type="number" id="dayInput" min="1" max="31" /></label>
+        <button type="button" onclick="updateIframe()">表示</button>
+    </div>
+
+    <iframe id="resvIframe" width="100%" height="400" style="border:1px solid #ccc;"></iframe>
+
 
     <script>
         document.getElementById('resvForm').addEventListener('submit', function (e) {
@@ -30,6 +47,26 @@
                 document.getElementById('endTimeUtc').value = endDate.toISOString();
             }
         });
+        window.addEventListener('load', () => {
+            const now = new Date();
+            document.getElementById('yearInput').value = now.getFullYear();
+            document.getElementById('monthInput').value = now.getMonth() + 1;  // 0始まりなので +1
+            document.getElementById('dayInput').value = now.getDate();
+            updateIframe();
+        });
+        // iframe更新関数
+        function updateIframe() {
+            const year = document.getElementById('yearInput').value;
+            const month = document.getElementById('monthInput').value;
+            const day = document.getElementById('dayInput').value;
+
+            if (year && month && day) {
+                const url = `/user/resv/get?year=${year}&month=${month}&day=${day}`;
+                document.getElementById('resvIframe').src = url;
+            } else {
+                alert("すべての項目を入力してください");
+            }
+        }
     </script>
 </body>
 </html>

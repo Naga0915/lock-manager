@@ -22,6 +22,6 @@ public class ReservationInfoRequestModel {
     @Positive
     private Integer day;
     @NotNull
-    @Positive
+    @Min(0)
     private Integer lockId;
 }
