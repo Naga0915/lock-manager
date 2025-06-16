@@ -37,3 +37,6 @@ db_data/
 
 ### logs ###
 log/
+
+### certificate ###
+cert/

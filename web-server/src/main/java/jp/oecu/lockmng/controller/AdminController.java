@@ -1,7 +1,14 @@
 package jp.oecu.lockmng.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.oecu.lockmng.config.properties.AppCommonConfig;
+import jp.oecu.lockmng.config.properties.CertConfig;
 import jp.oecu.lockmng.config.properties.ReservationConfig;
 import jp.oecu.lockmng.entity.NewRegister;
 import jp.oecu.lockmng.entity.User;
@@ -41,14 +49,16 @@ public class AdminController {
     private final NewRegisterService newRegisterService;
     private final AppCommonConfig appCommonConfig;
     private final ReservationService reservationService;
+    private final CertConfig certConfig;
     
     @Autowired
-    public AdminController(UserService userService, NewRegisterService newRegisterService, AppCommonConfig appCommonConfig, ReservationConfig reservationConfig, ReservationService reservationService){
+    public AdminController(UserService userService, NewRegisterService newRegisterService, AppCommonConfig appCommonConfig, ReservationConfig reservationConfig, ReservationService reservationService, CertConfig certConfig){
         this.userService = userService;
         this.newRegisterService = newRegisterService;
         this.appCommonConfig = appCommonConfig;
         this.reservationConfig = reservationConfig;
         this.reservationService = reservationService;
+        this.certConfig = certConfig;
     }
 
     @GetMapping("/admin")
@@ -171,5 +181,24 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("msg", result.getError());
         }
         return "redirect:/admin/resv";
+    }
+
+    @GetMapping("/admin/cert")
+    public String certView(Model model) {
+        try (Stream<Path> files = Files.list(Paths.get(certConfig.getFolder_name()))) {
+            List<String> certFiles = files
+                .filter(Files::isRegularFile)
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .filter(name -> name.endsWith(".pem"))
+                .collect(Collectors.toList());
+
+            model.addAttribute("certFiles", certFiles);
+        } catch (IOException e) {
+            // エラー時は空リスト or エラーメッセージをセット
+            model.addAttribute("certFiles", Collections.emptyList());
+            model.addAttribute("msg", "証明書一覧の取得に失敗しました");
+        }
+        return "admin/cert.html";
     }
 }

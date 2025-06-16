@@ -14,4 +14,8 @@ import lombok.Data;
 public class LockConfig {
     @Positive
     private Integer num = 4;
+    @Positive
+    private Integer timeout_millisecond = 10000;
+    @Positive
+    private Integer timeout_count_before_disconnect = 5;
 }
