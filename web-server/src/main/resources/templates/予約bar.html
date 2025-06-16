@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>てすとだよ</title>
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <!-- ヘッダに追加する場合ここに書く -->
+         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha256-BRqBN7dYgABqtY9Hd4ynE+1slnEw+roEPFzQ7TRRfcg=" crossorigin="anonymous"></script>
+        <!-- Tempus Dominus JavaScript -->
+        <script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/js/tempus-dominus.min.js" crossorigin="anonymous"></script>
+
+        <!-- Tempus Dominus Styles -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/css/tempus-dominus.min.css" crossorigin="anonymous">
+        <style>
+            .shape-container-bs {
+                height: 50px;
+            }
+
+            .dynamic-div-shape {
+                height:50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position:absolute;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div class="w-100 p-3 position-relative" style="background-color: greenyellow;">
+        <span class="position-absolute top-50 start-0 translate-middle-y ms-3">00:00</span>
+        <span class="position-absolute top-50 start-50 translate-middle-y ms-3">12:00</span>
+        <span class="position-absolute top-50 end-0 translate-middle-y ms-3">24:00</span>
+    </div>
+    <div id="shape-container" class="d-flex flex-wrap border rounded shape-container-bs"></div>
+<script>
+
+  setInterval(sub(), 10000)
+  function sub() {
+    const token = document.querySelector('meta[name="_csrf"]').content;
+    const header = document.querySelector('meta[name="_csrf_header"]').content;
+
+    fetch('/api/resv/get', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        [header]: token
+      },
+      body: JSON.stringify({ year, month, day, lockId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && Array.isArray(data.list)) {
+        data.list.forEach((pair, index) => {
+          const newShape = document.createElement('div');
+          newShape.classList.add('dynamic-div-shape');
+          newShape.style.width = `${(pair[1]-pair[0])*100}%`;
+          newShape.style.left = `${pair[0]*100}%`
+          newShape.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+
+          shapeContainer.appendChild(newShape);
+        });
+      } else {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 3;
+        cell.textContent = "データが見つかりません";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+      }
+    })
+    .catch(error => {
+      console.error("通信エラー:", error);
+      alert("サーバーとの通信に失敗しました");
+    });
+  }
+</script>
+    <div th:if="${msg != null}">
+        <div class="alert alert-success" role="alert">
+            メッセージ: <span th:text="${msg}"></span>
+        </div>
+    </div>
+</body>
+</html>
