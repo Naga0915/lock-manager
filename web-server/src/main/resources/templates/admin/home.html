@@ -1,25 +1,13 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理者ホーム画面</title>
-    <style>
-        .button-container {
-            text-align: left;
-            margin-left: 20px;
-        }
-
-        .admin-button {
-            display: block;
-            width: 200px;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 16px;
-        }
-    </style>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>監理者画面</title>
+        <!-- ヘッダに追加する場合ここに書く -->
+    </th:block>
 </head>
 <body>
+    <div th:replace="~{fragments/header :: header}"></div>
     <h1 style="text-align:center">管理者用ホーム画面</h1>
 
     <div class="button-container">
