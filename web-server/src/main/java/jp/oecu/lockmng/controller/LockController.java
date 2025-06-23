@@ -16,6 +16,9 @@ import jp.oecu.lockmng.component.DeviceManager;
 import jp.oecu.lockmng.model.LockRequestModel;
 import jp.oecu.lockmng.service.DeviceService;
 import jp.oecu.lockmng.util.CustomUserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @Controller
@@ -27,12 +30,43 @@ public class LockController {
     public LockController(DeviceManager deviceManager, DeviceService deviceService) {
         this.deviceManager = deviceManager;
         this.deviceService = deviceService;
-    }    
+    }
 
-    @PostMapping("/lock")
-    public String lockPost(@ModelAttribute LockRequestModel lockRequestModel, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        
-        return "ok";
+    @GetMapping("/user/lock")
+    public String userLock() {
+        return "user/lock.html";
+    }
+
+    @PostMapping("/user/lock")
+    public String userLockPost(@ModelAttribute @Valid LockRequestModel lockRequestModel, BindingResult bindingResult, RedirectAttributes redirectAttributes, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if(bindingResult.hasErrors()){
+            StringBuilder sb = new StringBuilder();
+            for (FieldError e : bindingResult.getFieldErrors()) {
+                sb.append(e.getDefaultMessage() + "\n");
+            }
+            redirectAttributes.addFlashAttribute("msg", sb.toString());
+            return "redirect:/user/lock";
+        }
+        if(LockRequestModel.OP_LOCK.equals(lockRequestModel.getOperation())){
+            Optional<String> result = deviceService.lock(userDetails, lockRequestModel.getLockId());
+            if(result.isPresent()){
+                redirectAttributes.addFlashAttribute("msg", result.get());
+                return "redirect:/user/lock";
+            }
+            redirectAttributes.addFlashAttribute("msg", String.format("鍵ID: %d を施錠しました", lockRequestModel.getLockId()));
+            return "redirect:/user/lock";
+        }else if(LockRequestModel.OP_UNLOCK.equals(lockRequestModel.getOperation())){
+            Optional<String> result = deviceService.unlock(userDetails, lockRequestModel.getLockId());
+            if(result.isPresent()){
+                redirectAttributes.addFlashAttribute("msg", result.get());
+                return "redirect:/user/lock";
+            }
+            redirectAttributes.addFlashAttribute("msg", String.format("鍵ID: %d を解錠しました", lockRequestModel.getLockId()));
+            return "redirect:/user/lock";
+        }else{
+            redirectAttributes.addFlashAttribute("msg", String.format("無効な命令: %s", lockRequestModel.getOperation()));
+            return "redirect:/user/lock";
+        }
     }
 
     @PostMapping("/admin/lock")

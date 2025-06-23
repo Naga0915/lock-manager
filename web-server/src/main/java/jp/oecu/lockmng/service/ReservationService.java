@@ -1,7 +1,10 @@
 package jp.oecu.lockmng.service;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,9 +55,24 @@ public class ReservationService {
         }
     }
 
-    public Result<List<Reservation>> findByTimeAndUser(ZonedDateTime time, CustomUserDetails userDetails){
+    public Result<List<Integer>> getLockIdReserved(ZonedDateTime time, CustomUserDetails userDetails){
         try{
-            return Result.success(reservationRepository.findByTimeAndUserRead(time, userDetails.getUser().getId()));
+            List<Reservation> list = reservationRepository.findByTimeAndUserRead(time, userDetails.getUser().getId());
+            if(list.isEmpty()){
+                return Result.error("現在予約されていません");
+            }else{
+                List<Integer> lockIds = new ArrayList<>();
+                Set<Integer> seen = new HashSet<>();
+
+                for (Reservation reservation : list) {
+                    int lockId = reservation.getLockId();
+                    if (seen.contains(lockId)) continue;  // すでに追加済みならスキップ
+
+                    lockIds.add(lockId);
+                    seen.add(lockId);  // 登録済みとして記録
+                }
+                return Result.success(lockIds);
+            }
         }catch(Exception e){
             log.error("予約情報取得時に予約サービスでエラー", e);
             return Result.error(e.getLocalizedMessage());

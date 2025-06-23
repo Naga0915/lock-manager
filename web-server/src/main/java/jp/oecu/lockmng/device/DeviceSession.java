@@ -41,11 +41,16 @@ public class DeviceSession {
         this.isAliveCount.set(0);
     }
 
-    public void startCommunicationThreads() {
+    public void startCommunicationThreads() throws InterruptedException {
         String uuid = UUID.randomUUID().toString().substring(0, 5);
         new Thread(this::receiveLoop, "ESP-Recv-" + uuid).start();
         new Thread(this::sendLoop, "ESP-Send-" + uuid).start();
         new Thread(this::startAliveThread, "ESP-IsAlive-" + uuid).start();
+        for (Integer lockId : device.getKeyIds()) {
+            log.info("sendCommandでロック送信予定: LOCK {}", lockId);
+            device.sendCommand(DeviceCommand.lock(lockId));
+            Thread.sleep(5);
+        }
         for (Integer lockId : device.getKeyIds()) {
             device.sendCommand(DeviceCommand.lock(lockId));
         }

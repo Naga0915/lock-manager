@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import jp.oecu.lockmng.model.ReservationInfoModel;
 import jp.oecu.lockmng.model.ReservationInfoRequestModel;
 import jp.oecu.lockmng.service.LockStateService;
 import jp.oecu.lockmng.service.ReservationService;
+import jp.oecu.lockmng.util.CustomUserDetails;
 import jp.oecu.lockmng.util.Result;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,7 +50,16 @@ public class ApiController {
         }
     }
     
-
+    @PostMapping("/api/lock/reserved")
+    public List<Integer> getLockIdsReserved(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Result<List<Integer>> result = reservationService.getLockIdReserved(ZonedDateTime.now(), userDetails);
+        if(result.isSuccess()){
+            return result.getValue();
+        }else{
+            return null;
+        }
+    }
+    
     @PostMapping("/api/resv/get")
     public ReservationInfoModel getResvInfo(@RequestBody @Valid ReservationInfoRequestModel model, BindingResult bindingResult) {
         ReservationInfoModel result = new ReservationInfoModel();
