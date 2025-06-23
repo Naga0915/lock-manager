@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.oecu.lockmng.config.properties.AppCommonConfig;
 import jp.oecu.lockmng.config.properties.CertConfig;
+import jp.oecu.lockmng.config.properties.LockConfig;
 import jp.oecu.lockmng.config.properties.ReservationConfig;
 import jp.oecu.lockmng.entity.NewRegister;
 import jp.oecu.lockmng.entity.User;
@@ -44,6 +45,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Controller
 public class AdminController {
 
+    private final LockConfig lockConfig;
     private final ReservationConfig reservationConfig;
     private final UserService userService;
     private final NewRegisterService newRegisterService;
@@ -52,13 +54,14 @@ public class AdminController {
     private final CertConfig certConfig;
     
     @Autowired
-    public AdminController(UserService userService, NewRegisterService newRegisterService, AppCommonConfig appCommonConfig, ReservationConfig reservationConfig, ReservationService reservationService, CertConfig certConfig){
+    public AdminController(UserService userService, NewRegisterService newRegisterService, AppCommonConfig appCommonConfig, ReservationConfig reservationConfig, ReservationService reservationService, CertConfig certConfig, LockConfig lockConfig){
         this.userService = userService;
         this.newRegisterService = newRegisterService;
         this.appCommonConfig = appCommonConfig;
         this.reservationConfig = reservationConfig;
         this.reservationService = reservationService;
         this.certConfig = certConfig;
+        this.lockConfig = lockConfig;
     }
 
     @GetMapping("/admin")
@@ -150,9 +153,10 @@ public class AdminController {
     }
     
     @GetMapping("/admin/lock")
-    public String lock(){
+    public String lock(Model model){
+        model.addAttribute("lockNum", lockConfig.getNum());
         return "admin/lock.html";
-    }
+    }    
 
     @GetMapping("/admin/resv")
     public String reserveAdmin() {

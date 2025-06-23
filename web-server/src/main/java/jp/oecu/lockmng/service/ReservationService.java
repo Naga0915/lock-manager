@@ -1,6 +1,5 @@
 package jp.oecu.lockmng.service;
 
-import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -15,6 +14,7 @@ import jp.oecu.lockmng.entity.Reservation;
 import jp.oecu.lockmng.entity.User;
 import jp.oecu.lockmng.model.NewReserveModel;
 import jp.oecu.lockmng.repository.jpa.ReservationRepository;
+import jp.oecu.lockmng.util.CustomUserDetails;
 import jp.oecu.lockmng.util.Result;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,6 +52,15 @@ public class ReservationService {
         }
     }
 
+    public Result<List<Reservation>> findByTimeAndUser(ZonedDateTime time, CustomUserDetails userDetails){
+        try{
+            return Result.success(reservationRepository.findByTimeAndUserRead(time, userDetails.getUser().getId()));
+        }catch(Exception e){
+            log.error("予約情報取得時に予約サービスでエラー", e);
+            return Result.error(e.getLocalizedMessage());
+        }
+    }
+
     @Transactional
     public Result<Boolean> newReserve(NewReserveModel model, User user){
         if(user == null){
@@ -63,6 +72,10 @@ public class ReservationService {
         try{
             ZonedDateTime startTime = model.getStartTime().atZone(timeZoneConfig.getZoneId());
             ZonedDateTime endTime = model.getEndTime().atZone(timeZoneConfig.getZoneId());
+            if(reservationConfig.getDivided_time_minute() > 0){
+                startTime = floorZonedDateTime(startTime, reservationConfig.getDivided_time_minute());
+                endTime = floorZonedDateTime(endTime, reservationConfig.getDivided_time_minute());
+            }
             if(startTime.isBefore(ZonedDateTime.now(timeZoneConfig.getZoneId()))){
                 return Result.error("過去に予約することはできません");
             }
@@ -77,10 +90,6 @@ public class ReservationService {
             }
             if(endTime.minusMinutes(reservationConfig.getMin_duration_minute()).isBefore(startTime) || endTime.minusMinutes(reservationConfig.getMax_duration_minute()).isAfter(startTime)){
                 return Result.error(String.format("予約は%d分間以上%d分間以内の期間である必要があります", reservationConfig.getMin_duration_minute(), reservationConfig.getMax_duration_minute()));
-            }
-            if(reservationConfig.getDivided_time_minute() > 0){
-                startTime = floorZonedDateTime(startTime, reservationConfig.getDivided_time_minute());
-                endTime = floorZonedDateTime(endTime, reservationConfig.getDivided_time_minute());
             }
             if(!reservationConfig.getAvailable_start().equals(reservationConfig.getAvailable_end())){
                 if(startTime.toLocalTime().isBefore(reservationConfig.getAvailable_start())){

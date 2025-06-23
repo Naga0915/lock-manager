@@ -65,4 +65,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
         @Param("end") ZonedDateTime end,
         @Param("lockId") Integer lockId
     );
+
+    @Query("""
+        SELECT r
+        FROM Reservation r
+        WHERE r.startTimeUtc < :time
+        AND r.endTimeUtc > :time
+        AND r.userId = :userId
+    """)
+    public List<Reservation> findByTimeAndUserRead(
+        @Param("time") ZonedDateTime time, 
+        @Param("userId") Integer userId
+    );
 }

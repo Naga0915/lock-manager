@@ -18,7 +18,7 @@ public class CertConfig {
     @NotNull
     @Min(1)
     @Max(65535)
-    private Integer tls_port = 8443;
+    private Integer tls_port = 8000;
     @NotNull
     private String folder_name = "cert";
     @Positive

@@ -17,6 +17,7 @@ public class LockState {
     /*
      * l: 施錠されている
      * u: 解錠されている
+     * d: 切断されているため不明
      */
     @Column(name = "state", nullable = false, length = 1)
     private String state;

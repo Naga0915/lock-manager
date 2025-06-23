@@ -1,6 +1,5 @@
 package jp.oecu.lockmng.entity;
 
-import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 
 import jakarta.persistence.Column;

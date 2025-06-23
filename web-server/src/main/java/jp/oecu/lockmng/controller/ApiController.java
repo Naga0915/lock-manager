@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import jp.oecu.lockmng.config.TimeZoneConfig;
+import jp.oecu.lockmng.entity.LockState;
 import jp.oecu.lockmng.entity.Reservation;
 import jp.oecu.lockmng.model.ReservationInfoModel;
 import jp.oecu.lockmng.model.ReservationInfoRequestModel;
+import jp.oecu.lockmng.service.LockStateService;
 import jp.oecu.lockmng.service.ReservationService;
 import jp.oecu.lockmng.util.Result;
 
@@ -24,14 +26,28 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 public class ApiController {
+
+    private final LockStateService lockStateService;
     private final ReservationService reservationService;
     private final TimeZoneConfig timeZoneConfig;
 
     @Autowired
-    public ApiController(ReservationService reservationService, TimeZoneConfig timeZoneConfig) {
+    public ApiController(ReservationService reservationService, TimeZoneConfig timeZoneConfig, LockStateService lockStateService) {
         this.reservationService = reservationService;
         this.timeZoneConfig = timeZoneConfig;
+        this.lockStateService = lockStateService;
     }
+
+    @PostMapping("/api/lock/get")
+    public List<LockState> getLockState() {
+        Result<List<LockState>> result = lockStateService.findAll();
+        if(result.isSuccess()){
+            return result.getValue();
+        }else{
+            return null;
+        }
+    }
+    
 
     @PostMapping("/api/resv/get")
     public ReservationInfoModel getResvInfo(@RequestBody @Valid ReservationInfoRequestModel model, BindingResult bindingResult) {

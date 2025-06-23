@@ -1,9 +1,7 @@
 package jp.oecu.lockmng.device;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import jp.oecu.lockmng.config.properties.LockConfig;
@@ -18,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 public class DeviceInfo {
     private final Integer deviceId;
-    private final List<Integer> keyIds;
+    private List<Integer> keyIds;
     private final BlockingQueue<String> sendQueue = new LinkedBlockingQueue<>();
     private volatile boolean connected = false;
     private DeviceSession session;

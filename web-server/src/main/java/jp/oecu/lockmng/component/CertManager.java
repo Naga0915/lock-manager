@@ -79,6 +79,7 @@ public class CertManager {
         ));
 
         X509Certificate certificate = generateCertificate(keyPair, dn);
+        printFingerprint(certificate);
 
         keyStore.setKeyEntry(alias, keyPair.getPrivate(), keystorePassword, new X509Certificate[]{certificate});
         saveCertificateAsPEM(certificate, certConfig.getFolder_name() + "/" + alias + ".pem");
@@ -148,5 +149,17 @@ public class CertManager {
             certOut.write("\n-----END CERTIFICATE-----\n".getBytes());
         }
         log.info("PEMファイルを保存しました: " + fileName);
+    }
+    public void printFingerprint(X509Certificate cert) throws Exception {
+        byte[] encoded = cert.getEncoded();
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] digest = md.digest(encoded);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < digest.length; i++) {
+            sb.append(String.format("%02X", digest[i]));
+            if (i < digest.length - 1) sb.append(":");
+        }
+        log.info("証明書のフィンガープリント (SHA-1): " + sb.toString());
     }
 }

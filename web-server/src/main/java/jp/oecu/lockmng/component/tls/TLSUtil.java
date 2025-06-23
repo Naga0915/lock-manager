@@ -18,6 +18,7 @@ public class TLSUtil {
         // 鍵と証明書を取得
         PrivateKey privateKey = certManager.getPrivateKey();
         X509Certificate certificate = certManager.getCertificate();
+        certManager.printFingerprint(certificate);
 
         // キーストアを作成し、鍵と証明書を登録
         KeyStore keyStore = KeyStore.getInstance("JKS");
