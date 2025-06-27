@@ -58,12 +58,12 @@ public class RegisterController {
                 sb.append(e.getDefaultMessage() + "\n");
             }
             redirectAttributes.addFlashAttribute("msg", bindingResult);
-            return "redirect:/register";
+            return "redirect:/register?id=" + userModel.getRegistrationId();
         }
         Optional<String> result = userService.newUser(userModel);
         if(result.isPresent()){
             redirectAttributes.addFlashAttribute("msg", result.get());
-            return "redirect:/register";
+            return "redirect:/register?id=" + userModel.getRegistrationId();
         }
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
@@ -76,7 +76,7 @@ public class RegisterController {
 
         return "redirect:/register/success";
     }
-    
+
     @GetMapping("/register/success")
     public String success() {
         return "/register/success.html";
@@ -133,5 +133,4 @@ public class RegisterController {
         }
         return "admin/register.html";
     }
-
 }
