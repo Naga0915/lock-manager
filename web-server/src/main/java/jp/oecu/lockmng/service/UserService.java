@@ -96,6 +96,9 @@ public class UserService {
     }
 
     public Optional<String> newUser(NewUserModel model){
+        if(model.getUserName().equals("Guest")){
+            return Optional.of("ユーザ名はGuest以外で設定してください");
+        }
         if(model.getPassword() != null)
         if(!model.getPassword().equals(model.getPasswordCheck())){
             return Optional.of("パスワードが一致しません。");

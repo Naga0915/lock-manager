@@ -19,11 +19,11 @@
           </ul>
           <ul class="navbar-nav ms-auto">
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Dropdown
+              <a class="nav-link dropdown-toggle" th:text="'ログイン中のユーザ: ' + ${username}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="/login">ログイン</a></li>
+                  <li th:if="${username != 'Guest'}"><a class="dropdown-item" href="/login">ログイン</a></li>
                   
                   <!-- ログアウトは POST リクエスト -->
                   <li>
