@@ -30,7 +30,7 @@ public class UserService {
     private String defaultAdminPassword;
     @Value("${ADMIN_EMAIL:defaultEmail}")
     private String defaultAdminEmail;
-    @Value("${ADMIN_PHONE:defaultEmail}")
+    @Value("${ADMIN_PHONE:defaultPhone}")
     private String defaultAdminPhone;
 
     @Autowired
