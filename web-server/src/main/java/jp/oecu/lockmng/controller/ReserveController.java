@@ -19,20 +19,15 @@ import jp.oecu.lockmng.util.Result;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
-
-
 
 @Controller
 public class ReserveController {
     private final ReservationService reservationService;
-    private final TimeZoneConfig timeZoneConfig;
     private final LockConfig lockConfig;
 
     @Autowired
-    public ReserveController(ReservationService reservationService, TimeZoneConfig timeZoneConfig, LockConfig lockConfig) {
+    public ReserveController(ReservationService reservationService, LockConfig lockConfig) {
         this.reservationService = reservationService;
-        this.timeZoneConfig = timeZoneConfig;
         this.lockConfig = lockConfig;
     }
 
@@ -65,7 +60,34 @@ public class ReserveController {
         return "redirect:/user/resv";
     }
     
-    
+    @GetMapping("/admin/resv")
+    public String reserveAdmin() {
+        return "admin/reserve.html";
+    }
+
+    @PostMapping("/admin/resv")
+    public String reserveAdminPost(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute NewReserveModel newReserveModel, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            StringBuilder sb = new StringBuilder();
+            for (FieldError e : bindingResult.getFieldErrors()) {
+                sb.append(e.getDefaultMessage() + "\n");
+            }
+            redirectAttributes.addFlashAttribute("msg", bindingResult);
+            return "redirect:/admin/resv";
+        }
+        //サービスの処理
+        if(userDetails == null){
+            redirectAttributes.addFlashAttribute("msg", "ログインしてください");
+            return "redirect:/admin/resv";
+        }
+        Result<Boolean> result = reservationService.newReserve(newReserveModel, userDetails.getUser());
+        if(result.isSuccess()){
+            redirectAttributes.addFlashAttribute("msg", "予約完了しました");
+        }else{
+            redirectAttributes.addFlashAttribute("msg", result.getError());
+        }
+        return "redirect:/admin/resv";
+    }
 
     @GetMapping("/user/resv/get")
     public String reserveView(Model model, @RequestParam String year, @RequestParam String month, @RequestParam String day) {

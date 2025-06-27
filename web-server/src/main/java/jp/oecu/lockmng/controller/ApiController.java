@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import jp.oecu.lockmng.config.TimeZoneConfig;
 import jp.oecu.lockmng.entity.LockState;
 import jp.oecu.lockmng.entity.Reservation;
+import jp.oecu.lockmng.entity.User;
 import jp.oecu.lockmng.model.ReservationInfoModel;
 import jp.oecu.lockmng.model.ReservationInfoRequestModel;
 import jp.oecu.lockmng.service.LockStateService;
@@ -52,7 +53,17 @@ public class ApiController {
     
     @PostMapping("/api/lock/reserved")
     public List<Integer> getLockIdsReserved(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        Result<List<Integer>> result = reservationService.getLockIdReserved(ZonedDateTime.now(), userDetails);
+        User user;
+        if(userDetails != null){
+            if(userDetails.getUser() != null){
+                user = userDetails.getUser();
+            }else{
+                return null;
+            }
+        }else{
+            return null;
+        }
+        Result<List<Integer>> result = reservationService.getLockIdReserved(ZonedDateTime.now(), user);
         if(result.isSuccess()){
             return result.getValue();
         }else{

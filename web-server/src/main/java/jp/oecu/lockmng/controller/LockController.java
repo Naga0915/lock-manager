@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,23 +14,23 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 import jp.oecu.lockmng.component.DeviceManager;
+import jp.oecu.lockmng.config.properties.LockConfig;
 import jp.oecu.lockmng.model.LockRequestModel;
 import jp.oecu.lockmng.service.DeviceService;
 import jp.oecu.lockmng.util.CustomUserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-
 
 @Controller
 public class LockController {
     private final DeviceManager deviceManager;
     private final DeviceService deviceService;
+    private final LockConfig lockConfig;
 
     @Autowired
-    public LockController(DeviceManager deviceManager, DeviceService deviceService) {
+    public LockController(DeviceManager deviceManager, DeviceService deviceService, LockConfig lockConfig) {
         this.deviceManager = deviceManager;
         this.deviceService = deviceService;
+        this.lockConfig = lockConfig;
     }
 
     @GetMapping("/user/lock")
@@ -67,6 +68,12 @@ public class LockController {
             redirectAttributes.addFlashAttribute("msg", String.format("無効な命令: %s", lockRequestModel.getOperation()));
             return "redirect:/user/lock";
         }
+    }
+    
+    @GetMapping("/admin/lock")
+    public String lock(Model model){
+        model.addAttribute("lockNum", lockConfig.getNum());
+        return "admin/lock.html";
     }
 
     @PostMapping("/admin/lock")

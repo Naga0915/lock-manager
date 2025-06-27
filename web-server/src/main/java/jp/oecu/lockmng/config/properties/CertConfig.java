@@ -20,6 +20,8 @@ public class CertConfig {
     @Max(65535)
     private Integer tls_port = 8000;
     @NotNull
+    private Boolean tls_enabled = true;
+    @NotNull
     private String folder_name = "cert";
     @Positive
     private Integer rsa_keySize = 2048;

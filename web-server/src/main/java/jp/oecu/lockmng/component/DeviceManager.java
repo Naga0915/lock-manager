@@ -75,10 +75,14 @@ public class DeviceManager {
 
     @PostConstruct
     public void startListener() {
-        String uuid = UUID.randomUUID().toString().substring(0, 5);
-        Thread listenerThread = new Thread(this::listenerLoop, "lsnLoop-" + uuid);
-        listenerThread.setDaemon(true); // アプリ終了時に終了させる場合
-        listenerThread.start();
+        if(certConfig.getTls_enabled()){
+            String uuid = UUID.randomUUID().toString().substring(0, 5);
+            Thread listenerThread = new Thread(this::listenerLoop, "lsnLoop-" + uuid);
+            listenerThread.setDaemon(true); // アプリ終了時に終了させる場合
+            listenerThread.start();
+        }else{
+            log.info("TLSサーバは無効になっています");
+        }
     }
 
     @PreDestroy

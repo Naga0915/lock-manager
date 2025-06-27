@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import jp.oecu.lockmng.config.properties.PasswordConfig;
 import jp.oecu.lockmng.config.properties.UserInfoConfig;
 import jp.oecu.lockmng.entity.User;
@@ -24,6 +26,13 @@ public class UserService {
     private final UserInfoConfig userInfoConfig;
     private final CommonValidator commonValidator;
 
+    @Value("${ADMIN_PASSWORD:defaultPassword}")
+    private String defaultAdminPassword;
+    @Value("${ADMIN_EMAIL:defaultEmail}")
+    private String defaultAdminEmail;
+    @Value("${ADMIN_PHONE:defaultEmail}")
+    private String defaultAdminPhone;
+
     @Autowired
     public UserService(UserRepository repository, PasswordEncoder passwordEncoder, PasswordConfig passwordConfig, CommonValidator commonValidator, UserInfoConfig userInfoConfig){
         this.userInfoConfig = userInfoConfig;
@@ -31,6 +40,20 @@ public class UserService {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.passwordConfig = passwordConfig;
+    }
+    
+    @PostConstruct
+    private void createAdminUser(){
+        if(repository.count() < 1){
+            User user = new User();
+            user.setIdStr("admin");
+            user.setName("admin");
+            user.setEmail(defaultAdminEmail);
+            user.setPhone(defaultAdminPhone);
+            user.setRole("ADMIN");
+            user.setPasswordHash(passwordEncoder.encode(defaultAdminPassword));
+            repository.save(user);
+        }
     }
 
     public List<User> findAll(){

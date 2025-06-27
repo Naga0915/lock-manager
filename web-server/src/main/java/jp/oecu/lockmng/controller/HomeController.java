@@ -29,10 +29,10 @@ public class HomeController {
         return "fragments/head.html";
     }
 
-    @GetMapping("/test/1")
-    public String test1() {
-        return "test.html";
-    }
+    // @GetMapping("/test/1")
+    // public String test1() {
+    //     return "test.html";
+    // }
     
     @GetMapping("/disclaimer")
     public String getDisclaimer() {

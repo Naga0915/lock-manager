@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jp.oecu.lockmng.component.DeviceManager;
+import jp.oecu.lockmng.entity.User;
 import jp.oecu.lockmng.util.CustomUserDetails;
 import jp.oecu.lockmng.util.Result;
 
@@ -23,7 +24,13 @@ public class DeviceService {
     }
 
     public Optional<String> lock(CustomUserDetails userDetails, Integer lockId){
-        Result<List<Integer>> result = reservationService.getLockIdReserved(ZonedDateTime.now(), userDetails);
+        User user;
+        if(userDetails.getUser() != null){
+            user = userDetails.getUser();
+        }else{
+            return Optional.of("解錠失敗: ログインしてください");
+        }
+        Result<List<Integer>> result = reservationService.getLockIdReserved(ZonedDateTime.now(), user);
         if(result.isSuccess()){
             List<Integer> list = result.getValue();
             for (Integer reservation : list) {
@@ -38,7 +45,13 @@ public class DeviceService {
     }
 
     public Optional<String> unlock(CustomUserDetails userDetails, Integer lockId){
-        Result<List<Integer>> result = reservationService.getLockIdReserved(ZonedDateTime.now(), userDetails);
+        User user;
+        if(userDetails.getUser() != null){
+            user = userDetails.getUser();
+        }else{
+            return Optional.of("解錠失敗: ログインしてください");
+        }
+        Result<List<Integer>> result = reservationService.getLockIdReserved(ZonedDateTime.now(), user);
         if(result.isSuccess()){
             List<Integer> list = result.getValue();
             for (Integer reservation : list) {

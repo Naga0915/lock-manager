@@ -17,7 +17,6 @@ import jp.oecu.lockmng.entity.Reservation;
 import jp.oecu.lockmng.entity.User;
 import jp.oecu.lockmng.model.NewReserveModel;
 import jp.oecu.lockmng.repository.jpa.ReservationRepository;
-import jp.oecu.lockmng.util.CustomUserDetails;
 import jp.oecu.lockmng.util.Result;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,9 +54,9 @@ public class ReservationService {
         }
     }
 
-    public Result<List<Integer>> getLockIdReserved(ZonedDateTime time, CustomUserDetails userDetails){
+    public Result<List<Integer>> getLockIdReserved(ZonedDateTime time, User user){
         try{
-            List<Reservation> list = reservationRepository.findByTimeAndUserRead(time, userDetails.getUser().getId());
+            List<Reservation> list = reservationRepository.findByTimeAndUserRead(time, user.getId());
             if(list.isEmpty()){
                 return Result.error("現在予約されていません");
             }else{
