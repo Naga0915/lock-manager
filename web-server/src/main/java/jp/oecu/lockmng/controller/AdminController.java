@@ -14,17 +14,23 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.oecu.lockmng.entity.User;
 import jp.oecu.lockmng.model.NewUserModel;
+import jp.oecu.lockmng.model.UserControllModel;
 import jp.oecu.lockmng.service.UserService;
 
 //管理者用ページなので一般ユーザはアクセスできない
 @Controller
 public class AdminController {
+    private final UserAccessController userAccessController;
+
+    private final UserContentController userContentController;
 
     private final UserService userService;
     
     @Autowired
-    public AdminController(UserService userService){
+    public AdminController(UserService userService, UserContentController userContentController, UserAccessController userAccessController){
         this.userService = userService;
+        this.userContentController = userContentController;
+        this.userAccessController = userAccessController;
     }
 
     @GetMapping("/admin")
@@ -37,6 +43,39 @@ public class AdminController {
         List<User> users = userService.findAll();
         model.addAttribute("users", users);
         return "admin/users.html";
+    }
+
+    @PostMapping("/admin/user")
+    public String userControll(@ModelAttribute UserControllModel userControllModel, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            StringBuilder sb = new StringBuilder();
+            for (FieldError e : bindingResult.getFieldErrors()) {
+                sb.append(e.getDefaultMessage() + "\n");
+            }
+            redirectAttributes.addFlashAttribute("msg", bindingResult);
+            return "redirect:/admin/user";
+        }
+        switch (userControllModel.getOperation()) {
+            case "switch":
+                switch (userControllModel.getOperand()) {
+                    case "enable":
+                        userService.enableUser(userControllModel.getUserId());
+                        redirectAttributes.addFlashAttribute("msg", String.format("ユーザID %d を有効にしました", userControllModel.getUserId()));
+                        break;
+                    case "disable":
+                        userService.disableUser(userControllModel.getUserId());
+                        redirectAttributes.addFlashAttribute("msg", String.format("ユーザID %d を無効にしました", userControllModel.getUserId()));
+                        break;
+                    default:
+                        redirectAttributes.addFlashAttribute("msg", String.format("無効なオペランド: %s", userControllModel.getOperand()));
+                        break;
+                }
+                break;
+            default:
+                redirectAttributes.addFlashAttribute("msg", String.format("無効な操作: %s", userControllModel.getOperation()));
+                break;
+        }
+        return "redirect:/admin/user";
     }
 
     @GetMapping("/admin/user/new")

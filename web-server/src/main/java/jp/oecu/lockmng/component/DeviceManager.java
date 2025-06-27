@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,6 +64,8 @@ public class DeviceManager {
     private final Map<Integer, DeviceInfo> devices = new ConcurrentHashMap<>();
     private final Map<Integer, Integer> locks = new ConcurrentHashMap<>();
     private Thread currentListener;
+    private ServerSocket sslServerSocket;
+    private volatile boolean running;
 
     @Autowired
     public DeviceManager(LockConfig lockConfig, LockStateService lockStateService, CertManager certManager, CertConfig certConfig) {
@@ -76,6 +79,7 @@ public class DeviceManager {
     @PostConstruct
     public void startListener() {
         if(certConfig.getTls_enabled()){
+            this.running = true;
             String uuid = UUID.randomUUID().toString().substring(0, 5);
             Thread listenerThread = new Thread(this::listenerLoop, "lsnLoop-" + uuid);
             listenerThread.setDaemon(true); // アプリ終了時に終了させる場合
@@ -86,14 +90,22 @@ public class DeviceManager {
     }
 
     @PreDestroy
-    private void destroyListener(){
+    private void destroyListener() {
         if (currentListener != null && currentListener.isAlive()) {
-            currentListener.interrupt();
+            this.running = false;
+            currentListener.interrupt(); // join()中ならこれで止まる
+            try {
+                if (sslServerSocket != null && !sslServerSocket.isClosed()) {
+                    sslServerSocket.close(); // accept() を強制終了
+                }
+            } catch (IOException e) {
+                log.warn("ServerSocket の close に失敗しました", e);
+            }
         }
     }
 
     private void listenerLoop() {
-        while (true) {
+        while (this.running) {
             String uuid = UUID.randomUUID().toString().substring(0, 5);
             Thread listenerThread = new Thread(this::handleConnection, "listener-" + uuid);
             listenerThread.setDaemon(true);
@@ -134,23 +146,30 @@ public class DeviceManager {
     }
 
     public void handleConnection() {
-        try (ServerSocket sslServerSocket = TLSUtil.createTLSServerSocket(certConfig.getTls_port(), certManager)) {
+        try (ServerSocket server = TLSUtil.createTLSServerSocket(certConfig.getTls_port(), certManager)) {
+            this.sslServerSocket = server;
             log.info("ESP接続待機開始...");
 
-            while (true) {
-                Socket socket = sslServerSocket.accept();
-                log.info("新しいESP接続: " + socket.getRemoteSocketAddress());
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Socket socket = server.accept();
+                    log.info("新しいESP接続: " + socket.getRemoteSocketAddress());
 
-                // 初期化を別スレッドで非同期実行
-                String uuid = UUID.randomUUID().toString().substring(0, 5);
-                Thread thread = new Thread(() -> initializeDevice(socket), "DevInit-" + uuid);
-                thread.start();            
+                    String uuid = UUID.randomUUID().toString().substring(0, 5);
+                    Thread thread = new Thread(() -> initializeDevice(socket), "DevInit-" + uuid);
+                    thread.start();
+                } catch (SocketException e) {
+                    // ソケットがcloseされたらここに来る
+                    log.warn("ソケットが閉じられました: ", e);
+                    break;
+                }
             }
         } catch (Exception e) {
             log.error("handleConnection エラー: ", e);
+        } finally {
+            log.info("handleConnection スレッド終了");
         }
     }
-
     private void initializeDevice(Socket socket) {
         try {
             socket.setSoTimeout(lockConfig.getTimeout_millisecond() * lockConfig.getTimeout_count_before_disconnect());

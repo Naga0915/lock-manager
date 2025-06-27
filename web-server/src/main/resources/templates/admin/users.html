@@ -7,27 +7,41 @@
     </th:block>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
-    <h1>ユーザ一覧</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ユーザID</th>
-                <th>氏名</th>
-                <th>メールアドレス</th>
-                <th>電話番号</th>
-                <th>ロール</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="user : ${users}">
-                <td th:text="${user.idStr}"></td>
-                <td th:text="${user.name}"></td>
-                <td th:text="${user.email}"></td>
-                <td th:text="${user.phone}"></td>
-                <td th:text="${user.role}"></td>
-            </tr>
-        </tbody>
-    </table>
+<div th:replace="~{fragments/header :: header}"></div>
+<h1>ユーザ一覧</h1>
+<table class="table">
+    <thead>
+    <tr>
+        <th>ユーザID</th>
+        <th>氏名</th>
+        <th>メールアドレス</th>
+        <th>電話番号</th>
+        <th>ロール</th>
+        <th>状態切替</th> <!-- 新しく追加 -->
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.idStr}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.phone}"></td>
+        <td th:text="${user.role}"></td>
+        <td>
+            <form th:action="@{/admin/user}" method="post">
+                <input type="hidden" name="userId" th:value="${user.id}"/>
+                <input type="hidden" name="operation" value="switch"/>
+                <input type="hidden" name="operand"
+                       th:value="${user.enabled} ? 'disable' : 'enable'"/>
+                <button type="submit"
+                        th:text="${user.enabled} ? '無効にする' : '有効にする'"
+                        class="btn btn-sm"
+                        th:classappend="${user.enabled} ? 'btn-danger' : 'btn-success'">
+                </button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

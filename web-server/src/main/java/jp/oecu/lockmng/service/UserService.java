@@ -56,6 +56,41 @@ public class UserService {
         }
     }
 
+    public Optional<String> enableUser(Integer id){
+        try {
+            Optional<User> optional = repository.findById(id);
+            if(optional.isPresent()){
+                User target = optional.get();
+                target.setEnabled(true);
+                repository.save(target);
+            }else{
+                return Optional.of("そのユーザIDは存在しません");
+            }
+        } catch (Exception e) {
+            Optional.of(e.getLocalizedMessage());
+        }
+        return Optional.empty();
+    }
+
+    public Optional<String> disableUser(Integer id){
+        try {
+            Optional<User> optional = repository.findById(id);
+            if(optional.isPresent()){
+                User target = optional.get();
+                if(target.getRole().equals("ADMIN")){
+                    return Optional.of("管理者ユーザは無効にできません");
+                }
+                target.setEnabled(false);
+                repository.save(target);
+            }else{
+                return Optional.of("そのユーザIDは存在しません");
+            }
+        } catch (Exception e) {
+            Optional.of(e.getLocalizedMessage());
+        }
+        return Optional.empty();
+    }
+
     public List<User> findAll(){
         return repository.findAll();
     }
