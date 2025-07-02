@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>電子錠ロッカー登録方法</title>
+        <!-- ヘッダに追加する場合ここに書く -->
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.8;
+          }
+          h1 {
+            background: #004080;
+            color: #fff;
+            padding: 10px;
+          }
+          h2 {
+            border-left: 5px solid #004080;
+            padding-left: 10px;
+          }
+          a {
+            color: #004080;
+            text-decoration: underline;
+          }
+        </style>
+    </th:block>
+</head>
+<body>
+  <div th:replace="~{fragments/header :: header}"></div>
+  <h1>電子錠ロッカー登録方法</h1>
+
+  <p>本施設では、学生証認証式の電子錠ロッカーを導入しています。ロッカーの利用を希望する方は、以下の手順で登録を行ってください。</p>
+
+  <h2>登録に必要な情報</h2>
+  <ul>
+    <li>学籍番号</li>
+    <li>氏名</li>
+    <li>住所</li>
+    <li>電話番号</li>
+    <li>OECUメールアドレス（大学付与のメール）</li>
+  </ul>
+
+  <h2>登録の流れ</h2>
+  <ol>
+    <li>下記の登録依頼メールひな形に必要事項を記入し、管理者メールアドレスへ送信してください。</li>
+    <li>メール送信後、入力内容は管理者に送信されます。</li>
+    <li>管理者が確認後、当日から7日以内に、登録されたOECUメールアドレス宛に結果をご連絡します。</li>
+  </ol>
+
+  <h2>注意事項</h2>
+  <ul>
+    <li>入力情報に不備がある場合、確認に時間がかかることがあります。</li>
+    <li>必ず大学のメールアドレスをご使用ください（例：***@oecu.jp）。</li>
+    <li>個人情報は電子錠ロッカー管理業務以外には使用しません。</li>
+  </ul>
+  <h2>登録依頼メールひな形</h2>
+<p>下記のひな形をコピーして必要事項を入力し、<strong>管理者メールアドレス</strong>に送信してください。</p>
+
+<pre>
+件名：電子錠ロッカー利用申請
+
+本文：
+電子錠ロッカーの利用を希望します。
+以下の通り、必要情報を提出します。
+
+・学籍番号：○○○○○○
+・氏名：○○○○
+・住所：〒○○○-○○○○ ○○市○○町○丁目○番地
+・電話番号：090-○○○○-○○○○
+・OECUメールアドレス：○○○○@oecu.jp
+
+よろしくお願いいたします。
+</pre>
+
+
+  <h2>お問い合わせ先</h2>
+  <p>
+    管理者メール：locker-admin@〇〇.ac.jp<br>
+  </p>
+
+  <h2>登録完了後</h2>
+  <p>登録完了後、管理者よりロッカー番号・利用開始日などの詳細をOECUメールアドレス宛にお知らせします。</p>
+
+  <p>安全かつ便利にご利用いただくため、正確な情報を入力し、登録完了メールを大切に保管してください。</p>
+
+</body>
+</html>
