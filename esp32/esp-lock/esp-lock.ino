@@ -1,20 +1,27 @@
 #include <BearSSLHelpers.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecureBearSSL.h>
+#include <Servo.h>
+#define LOCK_NUM 4
+#define ANGLE_OPEN 180
+#define ANGLE_CLOSE 0
 
-const char* ssid = "@@@@@@@@@@";
-const char* password = "@@@@@@@@@@@";
-const char* host = "@@@@@@@@@@@@";
-const int port = @@@@@@@@@@@@@@@;
-const char fingerprint[] PROGMEM = "@@@@@@@@@@@@@@";
+Servo lockers[LOCK_NUM];
+const char* myId = "0";
+const char* myKeys[] = {"0", "1", "2", "3"};
+const int pins[] = {4, 5, 13, 14};
+const int pulseMin[] = {500, 500, 500, 500};
+const int pulseMax[] = {2400, 2400, 2400, 2400};
+const int numKeys = LOCK_NUM;
+
+const char* ssid = "@@@@DO NOT COMMIT@@@@";
+const char* password = "@@@@DO NOT COMMIT@@@@";
+const char* host = "@@@@DO NOT COMMIT@@@@";
+const int port = 8000;
+const char fingerprint[] PROGMEM = "@@@@DO NOT COMMIT@@@@";
 const unsigned long timeoutMs = 10000;
 
 unsigned long lastReceive;
-
-
-const char* myId = "0";
-const char* myKeys[] = {"0", "1", "2", "3"};
-const int numKeys = sizeof(myKeys) / sizeof(myKeys[0]);
 
 BearSSL::WiFiClientSecure client;
 
@@ -22,6 +29,12 @@ void setup() {
   Serial.begin(74880);
   delay(1000);
   Serial.println("=== ESP8266 起動 ===");
+
+  for (int i = 0; i < LOCK_NUM; ++i) {
+    lockers[i].attach(pins[i], pulseMin[i], pulseMax[i]);
+  }
+
+  delay(1000);
 
   WiFi.begin(ssid, password);
   Serial.print("WiFi接続中");
@@ -159,7 +172,15 @@ bool lockKey(const String& keyId) {
     Serial.printf("LOCK 失敗: 鍵ID %s は保持していません\n", keyId.c_str());
     return false;
   }
-  Serial.printf("鍵ID %s をロックしました（ダミー）\n", keyId.c_str());
+
+  int index = keyId.toInt();  // 文字列 → 数値（インデックス化）
+  if (index < 0 || index >= LOCK_NUM) {
+    Serial.printf("LOCK エラー: インデックス %d は無効です\n", index);
+    return false;
+  }
+
+  Serial.printf("鍵ID %s をロックしました\n", keyId.c_str());
+  lockers[index].write(ANGLE_OPEN);  // ロック
   return true;
 }
 
@@ -168,7 +189,15 @@ bool unlockKey(const String& keyId) {
     Serial.printf("UNLOCK 失敗: 鍵ID %s は保持していません\n", keyId.c_str());
     return false;
   }
-  Serial.printf("鍵ID %s をアンロックしました（ダミー）\n", keyId.c_str());
+
+  int index = keyId.toInt();  // 文字列 → 数値（インデックス化）
+  if (index < 0 || index >= LOCK_NUM) {
+    Serial.printf("UNLOCK エラー: インデックス %d は無効です\n", index);
+    return false;
+  }
+
+  Serial.printf("鍵ID %s をアンロックしました\n", keyId.c_str());
+  lockers[index].write(ANGLE_CLOSE);  // アンロック
   return true;
 }
 
