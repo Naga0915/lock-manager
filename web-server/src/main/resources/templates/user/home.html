@@ -1,103 +1,148 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head(~{::additionalHead})}">
   <th:block th:fragment="additionalHead">
-    <title>ユーザ用画面</title>
-    <!-- Bootstrap CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ロッカー予約状況</title>
+
+    <!-- CSRF -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
     <style>
-      td {
-        width: 10vmin;
-        height: 10vmin;
-        vertical-align: middle;
-        text-align: center;
+      table {
+        border-collapse: collapse;
       }
-      table, td {
-        border: 2vmin solid #000; /* 黒の太い枠線 */
+      td {
+        min-width: 80px;
+        height: 80px;
+        text-align: center;
+        vertical-align: middle;
+        font-weight: bold;
+        border: 2px solid #000; /* 太めの線 */
+        cursor: default;
+        white-space: pre-line; /* tooltipの改行表示用 */
+      }
+      .bg-danger {
+        background-color: #dc3545 !important;
+        color: white;
+      }
+      .bg-success {
+        background-color: #28a745 !important;
+        color: white;
+      }
+      .bg-light {
+        background-color: #f8f9fa !important;
       }
     </style>
   </th:block>
 </head>
 
 <body>
-<div th:replace="~{fragments/header :: header}"></div>
+  <div th:replace="~{fragments/header :: header}"></div>
 
-<div class="container mt-4">
-  <h2 class="mb-4 text-center">ロッカー予約管理</h2>
+  <div class="container mt-4">
+    <h2 class="mb-4 text-center">ロッカー予約状況</h2>
 
-  <!-- JavaScriptで生成されるロッカー表 -->
-  <div id="lockerContainer" class="mb-4"></div>
-
-  <!-- 料金表とサイドメニュー -->
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <div class="border p-3">
-        <h3 class="h5">料金表</h3>
-        <p>ここに料金情報を記載します。</p>
-      </div>
+    <div class="table-responsive mb-4">
+      <table id="lockerTable" class="mx-auto"></table>
     </div>
 
-    <div class="col-md-6">
-      <div class="d-flex flex-column">
-        <a href="/user/register_guide" class="btn btn-outline-primary mb-2">登録方法</a>
-        <a href="#" class="btn btn-outline-primary mb-2">使用方法</a>
-        <a href="#" class="btn btn-outline-primary mb-2">支払方法</a>
-        <a href="/admin/resv" class="btn btn-outline-primary mb-2">予約</a>
-        <a href="/user/QandA" class="btn btn-outline-primary mb-2">よくある質問｜Q&A</a>
-        <a href="#" class="btn btn-outline-primary">質問フォーム</a>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <div class="border p-3">
+          <h3 class="h5">料金表</h3>
+          <p>ここに料金情報を記載します。</p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex flex-column">
+          <a href="/user/register_guide" class="btn btn-outline-primary mb-2">登録方法</a>
+          <a href="#" class="btn btn-outline-primary mb-2">使用方法</a>
+          <a href="#" class="btn btn-outline-primary mb-2">支払方法</a>
+          <a href="/admin/resv" class="btn btn-outline-primary mb-2">予約</a>
+          <a href="/user/QandA" class="btn btn-outline-primary mb-2">よくある質問｜Q&A</a>
+          <a href="#" class="btn btn-outline-primary">質問フォーム</a>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- BootstrapのJS（必要なら） -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-  const lockerCount = 15; // ロッカー数
-  // サーバーから取得すると想定するデータ
-  // 例：予約されているロッカー番号の配列
-  const reservedLockers = [2, 5, 7, 12]; // 例として予約済みロッカー
-
-  function createLockerTable(count, reserved) {
-    const container = document.getElementById('lockerContainer');
-    container.innerHTML = '';
-
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-bordered', 'mx-auto');
-
+  <script>
     const columns = 5; // 列数
-    const rows = Math.ceil(count / columns);
+    const rows = 4;    // 行数
+    const lockerCount = columns * rows;
 
-    let lockerNumber = 1;
+    async function loadLockerStatus() {
+      const token = document.querySelector('meta[name="_csrf"]').content;
+      const header = document.querySelector('meta[name="_csrf_header"]').content;
 
-    for (let i = 0; i < rows; i++) {
-      const tr = document.createElement('tr');
-      for (let j = 0; j < columns; j++) {
-        const td = document.createElement('td');
-        td.classList.add('border');
+      // ✅ JSだけで現在日付を作る
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1; // JSは0始まり
+      const day = now.getDate();
 
-        if (lockerNumber <= count) {
-          td.textContent = lockerNumber;
+      console.log(`年: ${year}, 月: ${month}, 日: ${day}`);
 
-          if (reserved.includes(lockerNumber)) {
-            td.classList.add('bg-danger', 'text-white'); // 赤: 予約済み
-          } else {
-            td.classList.add('bg-success', 'text-white'); // 緑: 空き
+      const reserved = [];
+
+      for (let lockId = 0; lockId < lockerCount; lockId++) {
+        try {
+          const response = await fetch('/api/resv/get', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              [header]: token
+            },
+            body: JSON.stringify({ year, month, day, lockId })
+          });
+
+          const data = await response.json();
+
+          if (data.success && Array.isArray(data.list) && data.list.length > 0) {
+            reserved.push(lockId + 1); // 表示番号に合わせて +1
           }
-
-          lockerNumber++;
-        } else {
-          td.classList.add('bg-light');
+        } catch (error) {
+          console.error(`鍵ID ${lockId} の取得失敗:`, error);
         }
-        tr.appendChild(td);
       }
-      table.appendChild(tr);
-    }
-    container.appendChild(table);
-  }
 
-  createLockerTable(lockerCount, reservedLockers);
-</script>
+      createLockerTable(lockerCount, reserved);
+    }
+
+    function createLockerTable(count, reserved) {
+      const table = document.getElementById('lockerTable');
+      table.innerHTML = '';
+      let lockerNumber = 1;
+
+      for (let i = 0; i < rows; i++) {
+        const tr = document.createElement('tr');
+        for (let j = 0; j < columns; j++) {
+          const td = document.createElement('td');
+          if (lockerNumber <= count) {
+            td.textContent = lockerNumber;
+            if (reserved.includes(lockerNumber)) {
+              td.classList.add('bg-danger', 'text-white'); // 予約済み
+              td.title = '予約済み';
+            } else {
+              td.classList.add('bg-success', 'text-white'); // 空き
+              td.title = '空き';
+            }
+            lockerNumber++;
+          } else {
+            td.classList.add('bg-light');
+          }
+          tr.appendChild(td);
+        }
+        table.appendChild(tr);
+      }
+    }
+
+    loadLockerStatus();
+  </script>
+
 </body>
 </html>

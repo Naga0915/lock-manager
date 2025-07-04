@@ -1,72 +1,134 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
 <head th:replace="~{fragments/head :: head(~{::additionalHead})}">
-    <th:block th:fragment="additionalHead">
-        <title>予約ページ</title>
-        <!-- ヘッダに追加する場合ここに書く -->
-    </th:block>
+  <th:block th:fragment="additionalHead">
+    <title>ロッカー使用状況可視化</title>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <meta name="param_year" th:content="${year}" />
+    <meta name="param_month" th:content="${month}" />
+    <meta name="param_day" th:content="${day}" />
+    <meta name="param_lockNum" th:content="${lockNum}" />
+
+    <style>
+      .shape-container-bs {
+        height: 50px;
+      }
+      .dynamic-div-shape {
+        height: 50px;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-size: 12px;
+        border-radius: 4px;
+      }
+      .time-bar {
+        position: relative;
+        background: #eee;
+      }
+    </style>
+  </th:block>
 </head>
+
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
-    <form id="resvForm" th:action="@{/user/resv}" method="post">
-        <label>開始時刻: <input type="datetime-local" name="startTimeLocal" id="startTime" /></label>
-        <label>終了時刻: <input type="datetime-local" name="endTimeLocal" id="endTime" /></label>
-        <label>Lock ID: <input type="number" name="lockId" /></label>
-        <input type="hidden" name="startTime" id="startTimeUtc" />
-        <input type="hidden" name="endTime" id="endTimeUtc" />
-        <input type="submit" value="予約送信" />
-    </form>
-    <div th:if="${msg != null}">
-        <div class="alert alert-success" role="alert">
-            メッセージ: <span th:text="${msg}"></span>
-        </div>
-    </div>
-    <hr>
-    <!-- iframeで予約状況を表示 -->
-    <div>
-        <h4>予約状況を表示</h4>
-        <label>年: <input type="number" id="yearInput" min="2000" max="2100" /></label>
-        <label>月: <input type="number" id="monthInput" min="1" max="12" /></label>
-        <label>日: <input type="number" id="dayInput" min="1" max="31" /></label>
-        <button type="button" onclick="updateIframe()">表示</button>
-    </div>
+  <!-- タイムライン -->
+  <div class="w-100 p-3 position-relative bg-light">
+    <span class="position-absolute top-50 start-0 translate-middle-y">00:00</span>
+    <span class="position-absolute top-50 start-50 translate-middle-y">12:00</span>
+    <span class="position-absolute top-50 end-0 translate-middle-y">24:00</span>
+  </div>
 
-    <iframe id="resvIframe" width="100%" height="400" style="border:1px solid #ccc;"></iframe>
+  <!-- ロッカー可視化 -->
+  <div id="shape-container" class="d-flex flex-column gap-2"></div>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      sub();
+      setInterval(sub, 10000);
+    });
 
-    <script>
-        document.getElementById('resvForm').addEventListener('submit', function (e) {
-            const startLocal = document.getElementById('startTime').value;
-            const endLocal = document.getElementById('endTime').value;
-            if (startLocal) {
-                const startDate = new Date(startLocal);
-                document.getElementById('startTimeUtc').value = startDate.toISOString(); // e.g. "2025-06-12T04:00:00.000Z"
-            }
-            if (endLocal) {
-                const endDate = new Date(endLocal);
-                document.getElementById('endTimeUtc').value = endDate.toISOString();
-            }
-        });
-        window.addEventListener('load', () => {
-            const now = new Date();
-            document.getElementById('yearInput').value = now.getFullYear();
-            document.getElementById('monthInput').value = now.getMonth() + 1;  // 0始まりなので +1
-            document.getElementById('dayInput').value = now.getDate();
-            updateIframe();
-        });
-        // iframe更新関数
-        function updateIframe() {
-            const year = document.getElementById('yearInput').value;
-            const month = document.getElementById('monthInput').value;
-            const day = document.getElementById('dayInput').value;
+    async function sub() {
+      const token = document.querySelector('meta[name="_csrf"]').content;
+      const header = document.querySelector('meta[name="_csrf_header"]').content;
+      const year = document.querySelector('meta[name="param_year"]').content;
+      const month = document.querySelector('meta[name="param_month"]').content;
+      const day = document.querySelector('meta[name="param_day"]').content;
+      const lockNum = parseInt(document.querySelector('meta[name="param_lockNum"]').content, 10);
 
-            if (year && month && day) {
-                const url = `/user/resv/get?year=${year}&month=${month}&day=${day}`;
-                document.getElementById('resvIframe').src = url;
-            } else {
-                alert("すべての項目を入力してください");
-            }
+      const shapeContainer = document.getElementById("shape-container");
+      shapeContainer.innerHTML = "";
+
+      for (let lockId = 0; lockId < lockNum; lockId++) {
+        // 1行（1ロッカー）を作る
+        const rowContainer = document.createElement("div");
+        rowContainer.classList.add('position-relative', 'shape-container-bs', 'border', 'rounded', 'time-bar');
+
+        // ラベル
+        const label = document.createElement("span");
+        label.textContent = `ロッカー ${lockId}`;
+        label.style.position = "absolute";
+        label.style.left = "5px";
+        label.style.top = "50%";
+        label.style.transform = "translateY(-50%)";
+        label.style.fontWeight = "bold";
+        rowContainer.appendChild(label);
+
+        shapeContainer.appendChild(rowContainer);
+
+        try {
+          const response = await fetch("/api/resv/get", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              [header]: token
+            },
+            body: JSON.stringify({ year, month, day, lockId })
+          });
+
+          const data = await response.json();
+
+          if (data.success && Array.isArray(data.list)) {
+            data.list.forEach((pair) => {
+              const div = document.createElement("div");
+              div.classList.add('dynamic-div-shape');
+
+              // 幅と位置を算出（左端0%〜右端100%）
+              const start = pair[0];
+              const end = pair[1];
+              const width = (end - start) * 100;
+              const left = start * 100;
+
+              div.style.left = `${left}%`;
+              div.style.width = `${width}%`;
+              div.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+
+              const startTime = formatTime(start);
+              const endTime = formatTime(end);
+
+              div.title = `${startTime} ～ ${endTime}`;
+
+              div.textContent = `${startTime} - ${endTime}`;
+
+              rowContainer.appendChild(div);
+            });
+          } else {
+            console.log(`ロッカー ${lockId} は予約なし`);
+          }
+
+        } catch (err) {
+          console.error(`ロッカー ${lockId} の取得エラー:`, err);
         }
-    </script>
+      }
+    }
+
+    function formatTime(fraction) {
+      const total = Math.round(fraction * 24 * 60);
+      const h = Math.floor(total / 60).toString().padStart(2, "0");
+      const m = (total % 60).toString().padStart(2, "0");
+      return `${h}:${m}`;
+    }
+  </script>
 </body>
 </html>
