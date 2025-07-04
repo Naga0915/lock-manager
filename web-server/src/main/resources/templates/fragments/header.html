@@ -23,7 +23,7 @@
                 
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                  <li th:if="${username != 'Guest'}"><a class="dropdown-item" href="/login">ログイン</a></li>
+                  <li th:if="${username == 'Guest'}"><a class="dropdown-item" href="/login">ログイン</a></li>
                   
                   <!-- ログアウトは POST リクエスト -->
                   <li>
