@@ -11,12 +11,14 @@ public class UserContentController {
     public String home(){
         return "user/home.html";
     }
-     @GetMapping("/user/register_guide")
+    
+    @GetMapping("/user/register_guide")
     public String registerguide(){
         return "user/register_guide.html";
     }
-     @GetMapping("/user/QandA")
-    public String QandA(){
-        return "user/QandA.html";
+
+    @GetMapping("/user/faq")
+    public String faq(){
+        return "user/faq.html";
     }
 }
