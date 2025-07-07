@@ -11,7 +11,7 @@
     <form id="resvForm" th:action="@{/user/resv}" method="post">
         <label>開始時刻: <input type="datetime-local" name="startTimeLocal" id="startTime" /></label>
         <label>終了時刻: <input type="datetime-local" name="endTimeLocal" id="endTime" /></label>
-        <label>Lock ID: <input type="number" name="lockId" /></label>
+        <label>Lock ID: <input type="number" name="lockId" value="0"/></label>
         <input type="hidden" name="startTime" id="startTimeUtc" />
         <input type="hidden" name="endTime" id="endTimeUtc" />
         <input type="submit" value="予約送信" />
@@ -35,6 +35,10 @@
 
 
     <script>
+        function getQueryParam(name) {//urlのパラメータ取得
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
         document.getElementById('resvForm').addEventListener('submit', function (e) {
             const startLocal = document.getElementById('startTime').value;
             const endLocal = document.getElementById('endTime').value;
@@ -48,12 +52,26 @@
             }
         });
         window.addEventListener('load', () => {
+            const qyear = getQueryParam('year');
+            const qmonth = getQueryParam('month');
+            const qday = getQueryParam('day');
+            const StartInput = document.getElementById('startTime');
+            const EndInput = document.getElementById('endTime');
+
             const now = new Date();
             document.getElementById('yearInput').value = now.getFullYear();
             document.getElementById('monthInput').value = now.getMonth() + 1;  // 0始まりなので +1
             document.getElementById('dayInput').value = now.getDate();
+
+            if(qyear && qmonth && qday){
+                document.getElementById('yearInput').value = qyear;
+                document.getElementById('monthInput').value = qmonth;
+                document.getElementById('dayInput').value = qday;
+                StartInput.value = `${qyear}-${qmonth.padStart(2, '0')}-${qday.padStart(2, '0')}T00:00`;
+                EndInput.value = `${qyear}-${qmonth.padStart(2, '0')}-${qday.padStart(2, '0')}T00:00`;
+            }
             updateIframe();
-        });
+        });month
         // iframe更新関数
         function updateIframe() {
             const year = document.getElementById('yearInput').value;

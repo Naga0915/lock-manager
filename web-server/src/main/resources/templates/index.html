@@ -12,8 +12,8 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 80%;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto;
+
         }
         #calendar-header {
             display: flex;
@@ -21,24 +21,35 @@
             align-items: center;
             margin-bottom: 20px;
         }
-        #calendar-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
         #calendar-table th, #calendar-table td {
-            border: 1px solid #dee2e6; /* Bootstrapのテーブルボーダー */
-            padding: 12px;
-            text-align: center;
+            padding: 1%;
+            transition: background-color 0.1s;
         }
+        
         #calendar-table th {
-            background-color: #e9ecef; /* Bootstrapのテーブルヘッダー背景色 */
+            background-color: #e9ecef;
         }
+        
         #calendar-table td.today {
-            background-color: #d1e7dd; /* Bootstrapのsuccess-light */
+            background-color: #d1e7dd;
             font-weight: bold;
         }
         #calendar-table td.outside-month {
             color: #6c757d; /* Bootstrapのmuted text */
+        }
+        #calendar-table td:hover{
+            background-color: gold;
+            cursor: pointer;
+        }
+        #calendar-table th.today:hover{
+            background-color: gold;
+        }
+        #calendar-table td.past-date {
+            color: #999;
+            cursor: default;
+        }
+        #calendar-table td.past-date:hover {
+            background-color: inherit;
         }
     </style>
   </th:block>
@@ -48,16 +59,16 @@
   <!-- ここから内容 -->
     <div class="container mt-5">
         <div class="text-center">
-            <h1>吹き溜まり</h1>
+            <h1>ESP-LOCKER</h1>
 
             <p>ようこそ、<span th:text="${username}"></span>様</p>
-            <a href="/user/reser" class="btn btn-primary mb-4">今すぐ予約</a>
+            <a href="/user/resv" class="btn btn-primary mb-4">今すぐ予約</a>
 
             <p>あなたの予約状況</p>
-            <a href="/user/resv" class="btn btn-success">日時・ロッカー番号</a>
+            <a href="/user" class="btn btn-success">日時・ロッカー番号</a>
 
             <p>免責事項</p>
-            <a href="/#" class="btn btn-success">確認</a>
+            <a href="/disclaimer" class="btn btn-success">確認</a>
         </div>
     </div>
 
@@ -70,7 +81,7 @@
             <h2 id="current-month-year" class="mb-0"></h2>
             <button id="next-month" class="btn btn-primary">次月 &gt;</button>
         </div>
-        <table id="calendar-table" class="table table-bordered table-hover">
+        <table id="calendar-table" class="table table-bordered">
             <thead>
                 <tr>
                     <th>日</th>
@@ -94,6 +105,9 @@
 
         let currentDate = new Date(); // 現在の日付を保持する変数
 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
         function generateCalendar(year, month) {
             calendarBody.innerHTML = ''; // 既存のカレンダーをクリア
 
@@ -109,29 +123,47 @@
 
                 for (let j = 0; j < 7; j++) {
                     const cell = document.createElement('td');
+                    let displayDate; // 表示する日付
+                    let actualDate;  // クリック時に使う正確な日付（時刻は00:00:00にリセット）
 
-                    if (i === 0 && j < firstDayOfMonth.getDay()) {
-                        // 前月の日付
+                    if (i === 0 && j < firstDayOfMonth.getDay()) {// 前月の日付
                         const prevMonthDate = new Date(year, month, 0);
                         const dayOffset = firstDayOfMonth.getDay() - j;
-                        cell.textContent = prevMonthDate.getDate() - dayOffset + 1;
+                        displayDate = prevMonthDate.getDate() - dayOffset + 1;
+                        actualDate = new Date(year, month - 1, displayDate);
+                        actualDate.setHours(0, 0, 0, 0);
                         cell.classList.add('outside-month');
-                    } else if (date > lastDayOfMonth.getDate()) {
-                        // 次月の日付
-                        cell.textContent = date - lastDayOfMonth.getDate();
+                    } else if (date > lastDayOfMonth.getDate()) {// 次月の日付
+                        displayDate = date - lastDayOfMonth.getDate();
+                        actualDate = new Date(year, month + 1, displayDate);
+                        actualDate.setHours(0, 0, 0, 0);
                         cell.classList.add('outside-month');
                         date++;
-                    } else {
-                        // 現在の月の日付
-                        cell.textContent = date;
-                        const cellDate = new Date(year, month, date);
+                    } else {// 現在の月の日付
+                        displayDate = date;
+                        actualDate = new Date(year, month, displayDate);
+                        actualDate.setHours(0, 0, 0, 0); // 時刻をリセット
 
-                        if (cellDate.getFullYear() === today.getFullYear() &&
-                            cellDate.getMonth() === today.getMonth() &&
-                            cellDate.getDate() === today.getDate()) {
+                        if (actualDate.getTime() === today.getTime()) {
                             cell.classList.add('today');
                         }
                         date++;
+                    }
+
+                    cell.textContent = displayDate;
+
+                    const isPastDate = actualDate.getTime() < today.setHours(0, 0, 0, 0);
+
+                    if (cell.classList.contains('outside-month')) {
+                        cell.classList.add('past-date');
+                    } else if (isPastDate) {
+                        // 過去の日付の場合
+                        cell.classList.add('past-date'); // 過去の日付を示すクラスを追加
+                    } else {
+                        // 今日または未来の日付の場合
+                        cell.addEventListener('click', () => {
+                            window.location.href=`/user/resv?year=${actualDate.getFullYear()}&month=${actualDate.getMonth()+1}&day=${actualDate.getDate()}`
+                        });
                     }
                     row.appendChild(cell);
                 }
