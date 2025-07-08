@@ -20,9 +20,9 @@
         text-align: center;
         vertical-align: middle;
         font-weight: bold;
-        border: 2px solid #000; /* 太めの線 */
+        border: 2px solid #000;
         cursor: default;
-        white-space: pre-line; /* tooltipの改行表示用 */
+        white-space: pre-line;
       }
       .bg-danger {
         background-color: #dc3545 !important;
@@ -53,22 +53,27 @@
       <div class="col-md-6 mb-3">
         <div class="border p-3">
           <h3 class="h5">料金表</h3>
-          <p>ここに料金情報を記載します。</p>
+          <p>
+            1時間 100円<br>
+            3時間 200円<br>
+            6時間 400円<br>
+            12時間 500円<br>
+            24時間 600円
+          </p>
         </div>
       </div>
 
-    <div class="col-md-6">
-      <div class="d-flex flex-column">
-        <a href="/user/register_guide" class="btn btn-outline-primary mb-2">登録方法</a>
-        <a href="#" class="btn btn-outline-primary mb-2">使用方法</a>
-        <a href="#" class="btn btn-outline-primary mb-2">支払方法</a>
-        <a href="/admin/resv" class="btn btn-outline-primary mb-2">予約</a>
-        <a href="/user/faq" class="btn btn-outline-primary mb-2">よくある質問｜Q&A</a>
-        <a href="#" class="btn btn-outline-primary">質問フォーム</a>
+      <div class="col-md-6">
+        <div class="d-flex flex-column">
+          <a href="/user/register_guide" class="btn btn-outline-primary mb-2">登録方法</a>
+          <a href="/user/method" class="btn btn-outline-primary mb-2">予約方法及び使用方法</a>
+          <a href="#" class="btn btn-outline-primary mb-2">支払方法</a>
+          <a href="/admin/resv" class="btn btn-outline-primary mb-2">予約</a>
+          <a href="/user/faq" class="btn btn-outline-primary mb-2">よくある質問｜Q&A</a>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <script>
     const columns = 5; // 列数
@@ -79,13 +84,10 @@
       const token = document.querySelector('meta[name="_csrf"]').content;
       const header = document.querySelector('meta[name="_csrf_header"]').content;
 
-      // ✅ JSだけで現在日付を作る
       const now = new Date();
       const year = now.getFullYear();
-      const month = now.getMonth() + 1; // JSは0始まり
+      const month = now.getMonth() + 1;
       const day = now.getDate();
-
-      console.log(`年: ${year}, 月: ${month}, 日: ${day}`);
 
       const reserved = [];
 
@@ -103,7 +105,7 @@
           const data = await response.json();
 
           if (data.success && Array.isArray(data.list) && data.list.length > 0) {
-            reserved.push(lockId + 1); // 表示番号に合わせて +1
+            reserved.push(lockId + 1);
           }
         } catch (error) {
           console.error(`鍵ID ${lockId} の取得失敗:`, error);
@@ -125,10 +127,10 @@
           if (lockerNumber <= count) {
             td.textContent = lockerNumber;
             if (reserved.includes(lockerNumber)) {
-              td.classList.add('bg-danger', 'text-white'); // 予約済み
+              td.classList.add('bg-danger', 'text-white');
               td.title = '予約済み';
             } else {
-              td.classList.add('bg-success', 'text-white'); // 空き
+              td.classList.add('bg-success', 'text-white');
               td.title = '空き';
             }
             lockerNumber++;

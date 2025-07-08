@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+  <th:block th:fragment="additionalHead">
+    <meta charset="UTF-8" />
+    <title>予約方法及び使用方法</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        line-height: 1.4;
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+        color: #333;
+      }
+      header {
+        background: #333;
+        color: #fff;
+        padding: 0.8rem;
+        text-align: center;
+        font-size: 1.3rem;
+      }
+      main {
+        max-width: 900px;
+        margin: 1.5rem auto;
+        padding: 0 1rem;
+      }
+      h2 {
+        margin-top: 1.8rem;
+        border-bottom: 2px solid #333;
+        padding-bottom: 0.4rem;
+        font-size: 1.4rem;
+      }
+      .steps {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        margin-top: 1rem;
+        overflow-x: auto;
+        padding: 0 1rem;
+        padding-bottom: 10px;
+      }
+      .arrow {
+        font-size: 1.6rem;
+        margin: 0 0.4rem;
+        flex-shrink: 0;
+        user-select: none;
+        color: #555;
+      }
+      .step {
+        text-align: center;
+        margin: 0 0.8rem;
+        min-width: 180px;
+        flex-shrink: 0;
+      }
+      .step img {
+        width: 420px; /* 基本3倍サイズ */
+        height: auto;
+        display: block;
+        margin: 0 auto 0.4rem auto;
+        border-radius: 5px;
+        box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      }
+      .step img.resv_2 {
+        width: 210px; /* 140px × 1.5 */
+      }
+      .step img.use_2 {
+        width: 420px;
+      }
+      .step p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        margin-top: 0;
+        color: #222;
+        white-space: normal;
+      }
+      @media (max-width: 600px) {
+        body {
+          font-size: 13px;
+        }
+        header {
+          font-size: 1.1rem;
+        }
+        h2 {
+          font-size: 1.2rem;
+        }
+        .steps {
+          flex-wrap: wrap;
+          overflow-x: visible;
+          justify-content: center;
+          margin-top: 1.2rem;
+          padding: 0;
+        }
+        .arrow {
+          display: none;
+        }
+        .step {
+          min-width: 100%;
+          margin: 0.5rem 0;
+        }
+        .step img {
+          width: 300px;
+        }
+        .step img.resv_2 {
+          width: 150px;
+        }
+        .step p {
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+  </th:block>
+</head>
+<body>
+
+  <!-- ヘッダー部分は Thymeleafフラグメントから呼び出し -->
+  <div th:replace="~{fragments/header :: header}"></div>
+
+  <!-- メインコンテンツ -->
+  <header>
+    <h1>予約方法及び使用方法</h1>
+  </header>
+
+  <main>
+    <section>
+      <h2>予約方法</h2>
+      <div class="steps">
+        <div class="step">
+          <img src="/r/resv_1.jpg" alt="ステップ1" class="resv_1">
+          <p>ヘッダーの「予約」ボタンをクリックしてください。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <img src="/r/resv_2.jpg" alt="ステップ2" class="resv_2">
+          <p>カレンダーから予約したい日付を選択します。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <img src="/r/resv_3.jpg" alt="ステップ3" class="resv_3">
+          <p>
+            予約状況を確認し、空きがあれば利用したい開始時刻と終了時刻を入力します。<br>
+            利用するロッカー番号を「Lock ID」に入力し、「予約送信」をクリックして予約完了です。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>使用方法</h2>
+      <div class="steps">
+        <div class="step">
+          <img src="/r/use_1.jpg" alt="使用ステップ1" class="use_1">
+          <p>ヘッダーの「解錠・施錠する」ボタンをクリックしてください。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <img src="/r/use_2.jpg" alt="使用ステップ2" class="use_2">
+          <p>
+            上記の図中にある表の黒くなっているボタンは、<br>
+            予約中のロッカーが施錠中なら赤色、<br>
+            解錠中なら緑色になります。
+          </p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="step">
+          <img src="/r/use_3.jpg" alt="使用ステップ3" class="use_3">
+          <p>
+            操作したいロッカーをクリックし、<br>
+            「lock」「unlock」を選択することで<br>
+            ロッカーの開閉操作ができます。<br>
+            予約時間中は何度でも操作可能です。
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+</body>
+</html>

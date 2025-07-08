@@ -21,6 +21,11 @@ public class UserContentController {
     public String faq(){
         return "user/faq.html";
     }
+
+    @GetMapping("/user/method")
+    public String method(){
+        return "user/method.html";
+    }
     
     @GetMapping("/admin/login")
     public String login(){
@@ -34,4 +39,5 @@ public class UserContentController {
     public String freez(){
         return "user/trap_freez.html";
     }
+    
 }
