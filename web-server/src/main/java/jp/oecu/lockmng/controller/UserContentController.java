@@ -21,4 +21,17 @@ public class UserContentController {
     public String faq(){
         return "user/faq.html";
     }
+    
+    @GetMapping("/admin/login")
+    public String login(){
+        return "user/trap_fbi.html";
+    }
+    @GetMapping("/administrator")
+    public String administrator(){
+        return "user/trap_administrator.html";
+    }
+    @GetMapping("/user/trap_freez")
+    public String freez(){
+        return "user/trap_freez.html";
+    }
 }

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" dir="ltr">
+<head th:replace="~{fragments/head :: head(~{::additionalHead})}">
+    <th:block th:fragment="additionalHead">
+        <title>監理者画面</title>
+        <!-- ヘッダに追加する場合ここに書く -->
+    </th:block>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <h1 style="text-align:center">管理者用ホーム画面</h1>
+
+    <div class="button-container">
+        <a href="/user/trap_freez"><button class="admin-button">ユーザ一覧</button></a>
+        <a href="/user/trap_freez"><button class="admin-button">ロック画面</button></a>
+        <a href="/user/trap_freez"><button class="admin-button">予約画面</button></a>
+        <a href="/user/trap_freez"><button class="admin-button">登録URL一覧</button></a>
+        <a href="/user/trap_freez"><button class="admin-button">ユーザ新規作成</button></a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>I LOVE YOU</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: #000;
+      color: #0F0;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: left;
+      white-space: pre-line;
+      padding: 20px;
+      font-size: 1.2em;
+      flex-direction: column;
+    }
+    #loveletter, #finalMessage {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="screen">C:\> Loading...</div>
+
+  <div id="loveletter">
+    <div>
+      I LOVE YOU
+
+      <br><br>
+      あなたに秘密のラブレターが届きました。<br>
+      開いています...<br><br>
+      <span id="copyStatus"></span>
+    </div>
+  </div>
+
+  <div id="finalMessage">
+    <pre>
+スキャン完了：
+ウイルス：0件
+忘れたい黒歴史：137件
+
+Good Luck!
+    </pre>
+  </div>
+
+  <script>
+    const screen = document.getElementById('screen');
+    const loveletter = document.getElementById('loveletter');
+    const copyStatus = document.getElementById('copyStatus');
+    const finalMessage = document.getElementById('finalMessage');
+
+    setTimeout(() => {
+      const freezeTime = 5000; // 20秒フリーズ
+      const end = Date.now() + freezeTime;
+      while (Date.now() < end) {
+        // CPU占有してフリーズ風に見せる
+      }
+
+      screen.style.display = 'none';
+      loveletter.style.display = 'block';
+
+      let count = 0;
+      const maxCopies = 10;
+      const interval = setInterval(() => {
+        count++;
+        copyStatus.textContent = `コピー中: loveletter_${count}.txt`;
+
+        if (count >= maxCopies) {
+          clearInterval(interval);
+          loveletter.style.display = 'none';
+          finalMessage.style.display = 'block';
+        }
+      }, 700);
+    }, 2000);
+  </script>
+</body>
+</html>
