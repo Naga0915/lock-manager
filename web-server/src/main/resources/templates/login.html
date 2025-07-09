@@ -8,15 +8,18 @@
 </head>
 <body>
   <div th:replace="~{fragments/header :: header}"></div>
-  <h1>ログイン画面</h1>
-  <form th:action="@{/login}" method="post">
-    <input type="text" name="userid" placeholder="ユーザID" required />
+  <h1 class="text-center">ログイン画面</h1>
+  <div class="text-center">
+    <form th:action="@{/login}" method="post">
+    <input type="text" name="userid" placeholder="ユーザID" required /><p></p>
     <input type="password" name="password" id="inPassword" placeholder="パスワード" required />
     <button class="btn btn-outline-secondary" type="button" id="toggle-password">
       <i class="bi bi-eye-slash" id="eyeIcon"></i>
-    </button>
+    </button><p></p>
     <button type="submit">Login</button>
   </form>
+  </div>
+  
   <div th:if="${param.s != null and param.s[0] == '0'}">
     <div class="alert alert-success" role="alert">
       メッセージ: パスワードかユーザーIDが違います
@@ -41,6 +44,6 @@
       }
     });
   </script>
-  <a href="/reset">パスワードを忘れた方はこちら</a>
+  <div class="text-center"><a href="/reset">パスワードを忘れた方はこちら</a></div>
 </body>
 </html>

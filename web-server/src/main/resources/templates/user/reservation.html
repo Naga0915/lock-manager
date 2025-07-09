@@ -28,13 +28,20 @@
         <label>年: <input type="number" id="yearInput" min="2000" max="2100" /></label>
         <label>月: <input type="number" id="monthInput" min="1" max="12" /></label>
         <label>日: <input type="number" id="dayInput" min="1" max="31" /></label>
-        <button type="button" onclick="updateIframe()">表示</button>
     </div>
 
     <iframe id="resvIframe" width="100%" height="400" style="border:1px solid #ccc;"></iframe>
 
 
     <script>
+        const yearin = document.getElementById("yearInput");
+        const monthin = document.getElementById("monthInput");
+        const dayin = document.getElementById("dayInput");
+
+        yearin.addEventListener("change", updateIframe);
+        monthin.addEventListener("change", updateIframe);
+        dayin.addEventListener("change", updateIframe);
+
         function getQueryParam(name) {//urlのパラメータ取得
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
