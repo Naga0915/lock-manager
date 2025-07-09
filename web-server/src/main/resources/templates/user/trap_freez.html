@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>I LOVE YOU</title>
+  <title>スキャン中...</title>
   <style>
     html, body {
       margin: 0; padding: 0; height: 100%;
@@ -18,30 +18,36 @@
       font-size: 1.2em;
       flex-direction: column;
     }
-    #loveletter, #finalMessage {
+    #scan, #finalMessage {
       display: none;
+    }
+    #progressBar {
+      width: 100%;
+      background: #222;
+      margin-top: 10px;
+    }
+    #progressFill {
+      display: inline-block;
+      height: 20px;
+      background: #0F0;
+      width: 0%;
     }
   </style>
 </head>
 <body>
   <div id="screen">C:\> Loading...</div>
 
-  <div id="loveletter">
-    <div>
-      I LOVE YOU
-
-      <br><br>
-      あなたに秘密のラブレターが届きました。<br>
-      開いています...<br><br>
-      <span id="copyStatus"></span>
+  <div id="scan">
+    あなたの人権を転送中
+    <div id="progressStatus"></div>
+    <div id="progressBar">
+      <div id="progressFill"></div>
     </div>
   </div>
 
   <div id="finalMessage">
-    <pre>
-スキャン完了：
-ウイルス：0件
-忘れたい黒歴史：137件
+    <pre id="finalText">
+人権剥奪が完了しました！：
 
 Good Luck!
     </pre>
@@ -49,32 +55,32 @@ Good Luck!
 
   <script>
     const screen = document.getElementById('screen');
-    const loveletter = document.getElementById('loveletter');
-    const copyStatus = document.getElementById('copyStatus');
+    const scan = document.getElementById('scan');
+    const progressStatus = document.getElementById('progressStatus');
+    const progressFill = document.getElementById('progressFill');
     const finalMessage = document.getElementById('finalMessage');
 
     setTimeout(() => {
-      const freezeTime = 5000; // 20秒フリーズ
+      // フリーズ風
+      const freezeTime = 2000; 
       const end = Date.now() + freezeTime;
-      while (Date.now() < end) {
-        // CPU占有してフリーズ風に見せる
-      }
+      while (Date.now() < end) {}
 
       screen.style.display = 'none';
-      loveletter.style.display = 'block';
+      scan.style.display = 'block';
 
-      let count = 0;
-      const maxCopies = 10;
+      let progress = 0;
       const interval = setInterval(() => {
-        count++;
-        copyStatus.textContent = `コピー中: loveletter_${count}.txt`;
+        progress++;
+        progressStatus.textContent = `${progress}%`;
+        progressFill.style.width = `${progress}%`;
 
-        if (count >= maxCopies) {
+        if (progress >= 100) {
           clearInterval(interval);
-          loveletter.style.display = 'none';
+          scan.style.display = 'none';
           finalMessage.style.display = 'block';
         }
-      }, 700);
+      }, 50);
     }, 2000);
   </script>
 </body>
