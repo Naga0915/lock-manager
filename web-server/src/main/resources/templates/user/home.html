@@ -89,6 +89,12 @@
       const month = now.getMonth() + 1;
       const day = now.getDate();
 
+      const hour = now.getHours();
+      const minutes = now.getMinutes();
+      const totalHours = (hour + (minutes / 60)) /24;
+
+      console.log(`年: ${year}, 月: ${month}, 日: ${day}`);
+
       const reserved = [];
 
       for (let lockId = 0; lockId < lockerCount; lockId++) {
@@ -104,8 +110,16 @@
 
           const data = await response.json();
 
+          
           if (data.success && Array.isArray(data.list) && data.list.length > 0) {
-            reserved.push(lockId + 1);
+            data.list.forEach((pair) => {
+              const start = pair[0];
+              const end = pair[1];
+              console.log("start：" + start + "\nend：" + end + "\ntotalhour：" + totalHours);
+              if(start <= totalHours && totalHours <= end){
+                reserved.push(lockId + 1); // 表示番号に合わせて +1
+              }
+            });
           }
         } catch (error) {
           console.error(`鍵ID ${lockId} の取得失敗:`, error);

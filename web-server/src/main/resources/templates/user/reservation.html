@@ -11,7 +11,7 @@
     <form id="resvForm" th:action="@{/user/resv}" method="post">
         <label>開始時刻: <input type="datetime-local" name="startTimeLocal" id="startTime" /></label>
         <label>終了時刻: <input type="datetime-local" name="endTimeLocal" id="endTime" /></label>
-        <label>Lock ID: <input type="number" name="lockId" value="0"/></label>
+        <label>Lock ID: <input type="number" name="lockId" id="LockId" value="1" min="1"/></label>
         <input type="hidden" name="startTime" id="startTimeUtc" />
         <input type="hidden" name="endTime" id="endTimeUtc" />
         <input type="submit" value="予約送信" />
@@ -39,6 +39,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
         }
+        
         document.getElementById('resvForm').addEventListener('submit', function (e) {
             const startLocal = document.getElementById('startTime').value;
             const endLocal = document.getElementById('endTime').value;
@@ -50,7 +51,9 @@
                 const endDate = new Date(endLocal);
                 document.getElementById('endTimeUtc').value = endDate.toISOString();
             }
+            document.getElementById('LockId').value--;
         });
+
         window.addEventListener('load', () => {
             const qyear = getQueryParam('year');
             const qmonth = getQueryParam('month');
